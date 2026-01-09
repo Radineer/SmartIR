@@ -5,7 +5,7 @@ primary_region = 'nrt'
 
 [env]
   APP_ENV = 'production'
-  ALLOWED_ORIGINS = 'https://frontend-eta-smoky-41.vercel.app,http://localhost:3000'
+  ALLOWED_ORIGINS = 'https://smartir-web-silk.vercel.app,http://localhost:3000'
 
 [http_service]
   internal_port = 8000
