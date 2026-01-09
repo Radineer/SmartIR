@@ -27,5 +27,5 @@ ENV PYTHONUNBUFFERED=1
 # ポートの公開
 EXPOSE 8000
 
-# 開発サーバーの起動
-CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000", "--reload"] 
+# サーバーの起動
+CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000"] 
