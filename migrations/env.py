@@ -22,7 +22,11 @@ if config.config_file_name is not None:
 target_metadata = Base.metadata
 
 def get_url():
-    return os.getenv("DATABASE_URL")
+    url = os.getenv("DATABASE_URL")
+    # Fly.io/Heroku uses postgres:// but SQLAlchemy 2.0+ requires postgresql://
+    if url and url.startswith("postgres://"):
+        url = url.replace("postgres://", "postgresql://", 1)
+    return url
 
 def run_migrations_offline():
     """SQLマイグレーションを生成するモード"""
