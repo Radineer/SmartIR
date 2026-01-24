@@ -15,7 +15,9 @@ class VTuberScriptGenerator:
     """AIVtuber用の台本を生成するクラス"""
 
     def __init__(self):
-        self.client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
+        api_key = os.getenv("OPENAI_API_KEY")
+        self.client = OpenAI(api_key=api_key) if api_key else None
+        self.enabled = api_key is not None
 
         # キャラクター設定（イリスの詳細プロフィール）
         self.character_profile = """
@@ -51,14 +53,18 @@ class VTuberScriptGenerator:
     def generate_script(self, analysis_result: Dict[str, Any], company_info: Dict[str, Any]) -> Optional[Dict[str, Any]]:
         """
         分析結果から配信用の台本を生成
-        
+
         Args:
             analysis_result (Dict[str, Any]): LLM分析の結果
             company_info (Dict[str, Any]): 企業情報
-            
+
         Returns:
             Optional[Dict[str, Any]]: 生成した台本
         """
+        if not self.enabled:
+            logger.warning("VTuber Script Generator is disabled (OPENAI_API_KEY not set)")
+            return None
+
         try:
             # 台本生成用のプロンプト
             prompt = f"""
@@ -159,6 +165,9 @@ class VTuberScriptGenerator:
         Returns:
             生成された台本と関連情報
         """
+        if not self.enabled:
+            return None
+
         try:
             now = datetime.now(JST)
             date_str = now.strftime("%Y年%m月%d日")
@@ -240,6 +249,9 @@ class VTuberScriptGenerator:
         Returns:
             生成された台本と関連情報
         """
+        if not self.enabled:
+            return None
+
         try:
             now = datetime.now(JST)
 
@@ -316,6 +328,9 @@ class VTuberScriptGenerator:
         Returns:
             生成された台本と関連情報
         """
+        if not self.enabled:
+            return None
+
         try:
             now = datetime.now(JST)
 
@@ -394,6 +409,9 @@ class VTuberScriptGenerator:
         Returns:
             生成された台本と関連情報
         """
+        if not self.enabled:
+            return None
+
         try:
             now = datetime.now(JST)
 
@@ -481,6 +499,9 @@ class VTuberScriptGenerator:
         Returns:
             生成された台本と関連情報
         """
+        if not self.enabled:
+            return None
+
         try:
             now = datetime.now(JST)
             from datetime import timedelta
@@ -569,6 +590,9 @@ class VTuberScriptGenerator:
         Returns:
             生成された台本と関連情報
         """
+        if not self.enabled:
+            return None
+
         try:
             now = datetime.now(JST)
 

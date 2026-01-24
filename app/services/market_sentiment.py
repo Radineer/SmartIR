@@ -60,7 +60,9 @@ class MarketSentimentAnalyzer:
     """
 
     def __init__(self):
-        self.client = AsyncOpenAI(api_key=os.getenv("OPENAI_API_KEY"))
+        api_key = os.getenv("OPENAI_API_KEY")
+        self.client = AsyncOpenAI(api_key=api_key) if api_key else None
+        self.enabled = api_key is not None
         self._sentiment_cache: Dict[str, Dict[str, Any]] = {}
         self._cache_ttl = 300  # キャッシュ有効期間（秒）
 
@@ -170,6 +172,18 @@ IR資料テキスト:
         Returns:
             SentimentScore: センチメントスコア
         """
+        if not self.enabled:
+            return SentimentScore(
+                positive=0.33,
+                negative=0.33,
+                neutral=0.34,
+                overall="neutral",
+                confidence=0.0,
+                source="ir",
+                analyzed_at=datetime.now(JST).isoformat(),
+                details={"error": "OPENAI_API_KEY not set"}
+            )
+
         try:
             # テキストが長すぎる場合は切り詰める
             max_length = 4000
