@@ -31,9 +31,9 @@ def upgrade():
         create_type=False
     )
 
-    # Enum型をデータベースに作成
-    op.execute("CREATE TYPE alerttype AS ENUM ('price_above', 'price_below', 'volatility', 'ir_release')")
-    op.execute("CREATE TYPE backteststatus AS ENUM ('pending', 'running', 'completed', 'failed')")
+    # Enum型をデータベースに作成（存在しない場合のみ）
+    op.execute("DO $$ BEGIN CREATE TYPE alerttype AS ENUM ('price_above', 'price_below', 'volatility', 'ir_release'); EXCEPTION WHEN duplicate_object THEN null; END $$;")
+    op.execute("DO $$ BEGIN CREATE TYPE backteststatus AS ENUM ('pending', 'running', 'completed', 'failed'); EXCEPTION WHEN duplicate_object THEN null; END $$;")
 
     # watchlists テーブルの作成
     op.create_table(

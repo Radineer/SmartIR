@@ -18,6 +18,7 @@ RUN pip install --no-cache-dir -r requirements.txt
 # アプリケーションコード
 COPY app/ ./app/
 COPY migrations/ ./migrations/
+COPY scripts/ ./scripts/
 COPY alembic.ini .
 
 # ポート公開
