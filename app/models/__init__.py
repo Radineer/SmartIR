@@ -4,6 +4,8 @@ from app.models.company import Company
 from app.models.document import Document
 from app.models.analysis import AnalysisResult
 from app.models.watchlist import Watchlist, WatchlistItem, PriceAlert, AlertType
+from app.models.backtest import BacktestJob, BacktestTemplate, BacktestStatus
+from app.models.notification import NotificationSettings, NotificationLog, NotificationChannel
 
 __all__ = [
     "BaseModel",
@@ -16,4 +18,10 @@ __all__ = [
     "WatchlistItem",
     "PriceAlert",
     "AlertType",
+    "BacktestJob",
+    "BacktestTemplate",
+    "BacktestStatus",
+    "NotificationSettings",
+    "NotificationLog",
+    "NotificationChannel",
 ]

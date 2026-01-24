@@ -20,6 +20,25 @@ import type {
   TechnicalAnalysisScriptRequest,
   PortfolioReviewScriptRequest,
   SentimentScriptRequest,
+  MLPrediction,
+  MLBatchPrediction,
+  FeatureImportance,
+  ModelEvaluation,
+  IrisMLComment,
+  BacktestStrategy,
+  BacktestRequest,
+  BacktestResult,
+  OptimizeRequest,
+  OptimizeResult,
+  BacktestHistoryItem,
+  PortfolioAnalysisPosition,
+  PortfolioAnalysisResult,
+  VaRResult,
+  CorrelationResult,
+  RebalanceMethod,
+  RebalanceResult,
+  EfficientFrontierResult,
+  RiskDecompositionResult,
 } from "@/types";
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000/api";
@@ -358,6 +377,117 @@ class ApiClient {
 
   async checkAlerts(): Promise<TriggeredAlert[]> {
     return this.request<TriggeredAlert[]>("/watchlist/alerts/check");
+  }
+
+  // ML予測
+  async getMLPrediction(ticker: string): Promise<MLPrediction> {
+    return this.request<MLPrediction>(`/ml/predict/${ticker}`);
+  }
+
+  async getMLBatchPrediction(tickers: string[]): Promise<MLBatchPrediction> {
+    return this.request<MLBatchPrediction>("/ml/predict/batch", {
+      method: "POST",
+      body: JSON.stringify({ tickers }),
+    });
+  }
+
+  async getFeatureImportance(ticker: string): Promise<FeatureImportance> {
+    return this.request<FeatureImportance>(`/ml/features/${ticker}`);
+  }
+
+  async getModelEvaluation(ticker: string): Promise<ModelEvaluation> {
+    return this.request<ModelEvaluation>(`/ml/evaluate/${ticker}`);
+  }
+
+  async getIrisMLComment(ticker: string): Promise<IrisMLComment> {
+    return this.request<IrisMLComment>(`/ml/iris-comment/${ticker}`);
+  }
+
+  // バックテスト
+  async getBacktestStrategies(): Promise<BacktestStrategy[]> {
+    return this.request<BacktestStrategy[]>("/backtest/strategies");
+  }
+
+  async runBacktest(request: BacktestRequest): Promise<BacktestResult> {
+    return this.request<BacktestResult>("/backtest/run", {
+      method: "POST",
+      body: JSON.stringify(request),
+    });
+  }
+
+  async optimizeBacktest(request: OptimizeRequest): Promise<OptimizeResult> {
+    return this.request<OptimizeResult>("/backtest/optimize", {
+      method: "POST",
+      body: JSON.stringify(request),
+    });
+  }
+
+  async getBacktestHistory(limit = 20): Promise<BacktestHistoryItem[]> {
+    return this.request<BacktestHistoryItem[]>(`/backtest/history?limit=${limit}`);
+  }
+
+  async getBacktestResult(id: number): Promise<BacktestResult> {
+    return this.request<BacktestResult>(`/backtest/history/${id}`);
+  }
+
+  // ポートフォリオ分析
+  async analyzePortfolio(positions: PortfolioAnalysisPosition[]): Promise<PortfolioAnalysisResult> {
+    return this.request<PortfolioAnalysisResult>("/portfolio/analyze", {
+      method: "POST",
+      body: JSON.stringify({ positions }),
+    });
+  }
+
+  async calculateVaR(
+    positions: PortfolioAnalysisPosition[],
+    confidenceLevel = 0.95,
+    timeHorizon = 1,
+    method: "historical" | "parametric" | "monte_carlo" = "parametric"
+  ): Promise<VaRResult> {
+    return this.request<VaRResult>("/portfolio/var", {
+      method: "POST",
+      body: JSON.stringify({
+        positions,
+        confidence_level: confidenceLevel,
+        time_horizon: timeHorizon,
+        method,
+      }),
+    });
+  }
+
+  async getCorrelation(positions: PortfolioAnalysisPosition[]): Promise<CorrelationResult> {
+    return this.request<CorrelationResult>("/portfolio/correlation", {
+      method: "POST",
+      body: JSON.stringify({ positions }),
+    });
+  }
+
+  async getRebalanceSuggestion(
+    positions: PortfolioAnalysisPosition[],
+    method: RebalanceMethod,
+    constraints?: { max_weight?: number; min_weight?: number }
+  ): Promise<RebalanceResult> {
+    return this.request<RebalanceResult>("/portfolio/rebalance", {
+      method: "POST",
+      body: JSON.stringify({ positions, method, constraints }),
+    });
+  }
+
+  async getEfficientFrontier(
+    positions: PortfolioAnalysisPosition[],
+    numPortfolios = 50
+  ): Promise<EfficientFrontierResult> {
+    return this.request<EfficientFrontierResult>("/portfolio/efficient-frontier", {
+      method: "POST",
+      body: JSON.stringify({ positions, num_portfolios: numPortfolios }),
+    });
+  }
+
+  async getRiskDecomposition(positions: PortfolioAnalysisPosition[]): Promise<RiskDecompositionResult> {
+    return this.request<RiskDecompositionResult>("/portfolio/risk-decomposition", {
+      method: "POST",
+      body: JSON.stringify({ positions }),
+    });
   }
 }
 

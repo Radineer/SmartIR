@@ -6,7 +6,10 @@ from sqlalchemy import pool
 
 from alembic import context
 from app.core.database import Base
-from app.models import company, document  # 必要なモデルをインポート
+# 必要なモデルをすべてインポート（autogenerateで検出されるようにする）
+from app.models import (
+    company, document, user, analysis, watchlist, backtest
+)
 
 # Alembic Config オブジェクト
 config = context.config

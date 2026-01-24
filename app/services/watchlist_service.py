@@ -21,7 +21,11 @@ from app.schemas.watchlist import (
     TriggeredAlertResponse,
 )
 from app.services.market_data import market_data_service
+from typing import TYPE_CHECKING
 import logging
+
+if TYPE_CHECKING:
+    from app.services.notification_service import NotificationService
 
 logger = logging.getLogger(__name__)
 
@@ -443,6 +447,53 @@ class WatchlistService:
 
         if triggered:
             db.commit()
+
+        return triggered
+
+    async def check_alerts_and_notify(self, db: Session) -> List[TriggeredAlertResponse]:
+        """
+        全アラートをチェックしてトリガーされたものに通知を送信
+
+        Args:
+            db: DBセッション
+
+        Returns:
+            トリガーされたアラート一覧
+        """
+        from app.services.notification_service import notification_service
+
+        triggered = self.check_alerts(db)
+
+        # トリガーされた各アラートに対して通知を送信
+        for alert_response in triggered:
+            try:
+                # アラートからユーザーIDを取得
+                alert = db.query(PriceAlert).filter(
+                    PriceAlert.id == alert_response.alert_id
+                ).first()
+
+                if alert and alert.watchlist_item:
+                    watchlist = alert.watchlist_item.watchlist
+                    if watchlist:
+                        user_id = watchlist.user_id
+
+                        # 通知を送信
+                        await notification_service.send_alert_notification(
+                            db=db,
+                            user_id=user_id,
+                            alert_id=alert_response.alert_id,
+                            ticker_code=alert_response.ticker_code,
+                            stock_name=alert_response.stock_name or "",
+                            alert_type=alert_response.alert_type,
+                            threshold=alert_response.threshold,
+                            current_price=alert_response.current_price
+                        )
+                        logger.info(
+                            f"Notification sent for alert {alert_response.alert_id} "
+                            f"to user {user_id}"
+                        )
+            except Exception as e:
+                logger.error(f"Failed to send notification for alert {alert_response.alert_id}: {e}")
 
         return triggered
 

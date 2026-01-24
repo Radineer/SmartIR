@@ -332,3 +332,312 @@ export interface TriggeredAlert {
   current_price: number;
   triggered_at: string;
 }
+
+// ML予測
+export type PredictionDirection = "up" | "down" | "neutral";
+
+export interface MLPrediction {
+  ticker: string;
+  direction: PredictionDirection;
+  probability: number;
+  confidence: number;
+  predicted_at: string;
+  model_version?: string;
+}
+
+export interface MLBatchPrediction {
+  predictions: MLPrediction[];
+  requested_at: string;
+}
+
+export interface FeatureImportance {
+  ticker: string;
+  features: {
+    name: string;
+    importance: number;
+    description?: string;
+  }[];
+  computed_at: string;
+}
+
+export interface ModelEvaluation {
+  ticker: string;
+  accuracy: number;
+  precision: number;
+  recall: number;
+  f1_score: number;
+  training_samples: number;
+  test_samples: number;
+  last_trained: string;
+  model_version?: string;
+}
+
+export interface IrisMLComment {
+  ticker: string;
+  comment: string;
+  sentiment: "bullish" | "bearish" | "neutral";
+  generated_at: string;
+}
+
+// バックテスト
+export type BacktestStrategyId =
+  | "sma_cross"
+  | "rsi"
+  | "macd"
+  | "bollinger"
+  | "momentum"
+  | "mean_reversion"
+  | "breakout";
+
+export interface BacktestStrategy {
+  id: BacktestStrategyId;
+  name: string;
+  description: string;
+  parameters: BacktestParameter[];
+}
+
+export interface BacktestParameter {
+  name: string;
+  label: string;
+  type: "number" | "select";
+  default: number | string;
+  min?: number;
+  max?: number;
+  step?: number;
+  options?: { value: string | number; label: string }[];
+}
+
+export interface BacktestRequest {
+  ticker_code: string;
+  strategy_id: BacktestStrategyId;
+  start_date: string;
+  end_date: string;
+  initial_capital: number;
+  parameters: Record<string, number | string>;
+}
+
+export interface BacktestTrade {
+  date: string;
+  action: "buy" | "sell";
+  price: number;
+  shares: number;
+  value: number;
+  pnl?: number;
+  pnl_percent?: number;
+}
+
+export interface BacktestResult {
+  id: number;
+  ticker_code: string;
+  strategy_id: BacktestStrategyId;
+  strategy_name: string;
+  start_date: string;
+  end_date: string;
+  initial_capital: number;
+  final_value: number;
+  total_return: number;
+  total_return_percent: number;
+  annualized_return: number;
+  sharpe_ratio: number;
+  max_drawdown: number;
+  max_drawdown_percent: number;
+  win_rate: number;
+  profit_factor: number;
+  total_trades: number;
+  winning_trades: number;
+  losing_trades: number;
+  avg_win: number;
+  avg_loss: number;
+  best_trade: number;
+  worst_trade: number;
+  equity_curve: { date: string; value: number }[];
+  trades: BacktestTrade[];
+  parameters: Record<string, number | string>;
+  created_at: string;
+}
+
+export interface OptimizeRequest {
+  ticker_code: string;
+  strategy_id: BacktestStrategyId;
+  start_date: string;
+  end_date: string;
+  initial_capital: number;
+  parameter_ranges: Record<string, { min: number; max: number; step: number }>;
+  optimize_target: "sharpe_ratio" | "total_return" | "max_drawdown";
+}
+
+export interface OptimizeResult {
+  best_parameters: Record<string, number | string>;
+  best_score: number;
+  optimize_target: string;
+  results: {
+    parameters: Record<string, number | string>;
+    score: number;
+    total_return_percent: number;
+    sharpe_ratio: number;
+    max_drawdown_percent: number;
+  }[];
+  backtest_result: BacktestResult;
+}
+
+export interface BacktestHistoryItem {
+  id: number;
+  ticker_code: string;
+  strategy_name: string;
+  start_date: string;
+  end_date: string;
+  total_return_percent: number;
+  sharpe_ratio: number;
+  created_at: string;
+}
+
+// ポートフォリオ分析
+export interface PortfolioAnalysisPosition {
+  ticker_code: string;
+  quantity: number;
+  avg_price: number;
+}
+
+export interface PortfolioAnalysisRequest {
+  positions: PortfolioAnalysisPosition[];
+}
+
+export interface PositionResult {
+  ticker_code: string;
+  name?: string;
+  sector?: string;
+  quantity: number;
+  avg_price: number;
+  current_price: number;
+  market_value: number;
+  weight: number;
+  unrealized_pnl: number;
+  unrealized_pnl_percent: number;
+  daily_return?: number;
+  volatility?: number;
+}
+
+export interface SectorAllocation {
+  sector: string;
+  weight: number;
+  value: number;
+}
+
+export interface PortfolioAnalysisResult {
+  total_value: number;
+  total_cost: number;
+  total_unrealized_pnl: number;
+  total_unrealized_pnl_percent: number;
+  expected_return?: number;
+  volatility?: number;
+  sharpe_ratio?: number;
+  positions: PositionResult[];
+  sector_allocation: SectorAllocation[];
+  analysis_date: string;
+}
+
+export interface VaRRequest {
+  positions: PortfolioAnalysisPosition[];
+  confidence_level?: number;
+  time_horizon?: number;
+  method?: "historical" | "parametric" | "monte_carlo";
+}
+
+export interface VaRResult {
+  var_value: number;
+  var_percent: number;
+  confidence_level: number;
+  time_horizon: number;
+  method: string;
+  expected_shortfall?: number;
+  portfolio_value: number;
+}
+
+export interface CorrelationRequest {
+  positions: PortfolioAnalysisPosition[];
+}
+
+export interface CorrelationResult {
+  tickers: string[];
+  correlation_matrix: number[][];
+  highly_correlated_pairs: Array<{
+    ticker1: string;
+    ticker2: string;
+    correlation: number;
+  }>;
+}
+
+export type RebalanceMethod =
+  | "equal_weight"
+  | "min_variance"
+  | "risk_parity"
+  | "max_sharpe";
+
+export interface RebalanceRequest {
+  positions: PortfolioAnalysisPosition[];
+  method: RebalanceMethod;
+  constraints?: {
+    max_weight?: number;
+    min_weight?: number;
+  };
+}
+
+export interface RebalanceSuggestion {
+  ticker_code: string;
+  current_weight: number;
+  target_weight: number;
+  weight_change: number;
+  action: "buy" | "sell" | "hold";
+  suggested_quantity_change: number;
+}
+
+export interface RebalanceResult {
+  method: string;
+  suggestions: RebalanceSuggestion[];
+  expected_improvement: {
+    sharpe_before?: number;
+    sharpe_after?: number;
+    volatility_before?: number;
+    volatility_after?: number;
+  };
+}
+
+export interface EfficientFrontierRequest {
+  positions: PortfolioAnalysisPosition[];
+  num_portfolios?: number;
+}
+
+export interface EfficientFrontierPoint {
+  expected_return: number;
+  volatility: number;
+  sharpe_ratio: number;
+  weights: { [ticker: string]: number };
+}
+
+export interface EfficientFrontierResult {
+  frontier_points: EfficientFrontierPoint[];
+  current_portfolio: {
+    expected_return: number;
+    volatility: number;
+    sharpe_ratio: number;
+  };
+  optimal_portfolio: EfficientFrontierPoint;
+  min_variance_portfolio: EfficientFrontierPoint;
+}
+
+export interface RiskDecompositionRequest {
+  positions: PortfolioAnalysisPosition[];
+}
+
+export interface RiskContribution {
+  ticker_code: string;
+  marginal_contribution: number;
+  contribution_percent: number;
+  standalone_volatility: number;
+}
+
+export interface RiskDecompositionResult {
+  total_volatility: number;
+  contributions: RiskContribution[];
+  diversification_ratio: number;
+}

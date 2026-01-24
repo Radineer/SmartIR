@@ -25,11 +25,18 @@ export function SiteOrganizationData() {
   const data = {
     "@context": "https://schema.org",
     "@type": "Organization",
-    name: "AI-IR Insight",
-    description: "AIによるIR資料分析とAIVtuber配信プラットフォーム",
+    name: "イリスのIR分析",
+    alternateName: "Iris IR Analysis",
+    description: "2050年から来たAIアナリスト「イリス」による上場企業IR資料分析プラットフォーム",
     url: SITE_URL,
-    logo: `${SITE_URL}/logo.png`,
+    logo: `${SITE_URL}/images/iris/iris-icon.png`,
     sameAs: [],
+    // イリスというキャラクターを持つことを示す
+    brand: {
+      "@type": "Brand",
+      name: "イリス",
+      description: "金融特化型AIアナリスト。2050年の東京証券取引所AI研究部門から転送されてきた。",
+    },
   };
 
   return <StructuredData data={data} />;
@@ -42,8 +49,10 @@ export function WebSiteData() {
   const data = {
     "@context": "https://schema.org",
     "@type": "WebSite",
-    name: "AI-IR Insight",
+    name: "イリスのIR分析",
+    alternateName: "Iris IR Analysis",
     url: SITE_URL,
+    description: "AIアナリスト「イリス」と一緒にIR資料を読み解く",
     potentialAction: {
       "@type": "SearchAction",
       target: {

@@ -2,7 +2,9 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { AuthProvider } from "@/hooks/useAuth";
+import { WatchlistProvider } from "@/contexts/WatchlistContext";
 import Header from "@/components/Header";
+import Footer from "@/components/Footer";
 import { SiteOrganizationData, WebSiteData } from "@/components/StructuredData";
 
 const geistSans = Geist({
@@ -15,38 +17,40 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
-const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://smartir-web-silk.vercel.app";
-
 export const metadata: Metadata = {
+  metadataBase: new URL("https://smartir-web-silk.vercel.app"),
   title: {
-    default: "AI-IR Insight - AIによるIR資料分析プラットフォーム",
-    template: "%s | AI-IR Insight",
+    default: "イリスのIR分析 | AI IR Insight",
+    template: "%s | イリスのIR分析",
   },
-  description:
-    "上場企業のIR資料をAIが自動分析。決算短信、有価証券報告書の要約・センチメント分析で投資判断をサポート。",
-  keywords: ["IR分析", "決算", "株式投資", "AI", "決算短信", "有価証券報告書", "企業分析"],
-  authors: [{ name: "AI-IR Insight" }],
-  metadataBase: new URL(SITE_URL),
+  description: "2050年から来たAIアナリスト「イリス」が、上場企業のIR資料をわかりやすく解説。決算短信・有価証券報告書の要約、センチメント分析をお届けします。",
+  keywords: ["IR分析", "決算", "有価証券報告書", "AI分析", "株式投資", "企業分析", "イリス"],
+  authors: [{ name: "イリスのIR分析" }],
   openGraph: {
     type: "website",
     locale: "ja_JP",
-    url: SITE_URL,
-    siteName: "AI-IR Insight",
-    title: "AI-IR Insight - AIによるIR資料分析プラットフォーム",
-    description:
-      "上場企業のIR資料をAIが自動分析。決算短信、有価証券報告書の要約・センチメント分析で投資判断をサポート。",
+    url: "https://smartir-web-silk.vercel.app",
+    siteName: "イリスのIR分析",
+    title: "イリスのIR分析 | AI IR Insight",
+    description: "2050年から来たAIアナリスト「イリス」が、上場企業のIR資料をわかりやすく解説。",
+    images: [
+      {
+        url: "/images/og-image.png",
+        width: 1200,
+        height: 630,
+        alt: "イリスのIR分析",
+      },
+    ],
   },
   twitter: {
     card: "summary_large_image",
-    title: "AI-IR Insight - AIによるIR資料分析プラットフォーム",
-    description: "上場企業のIR資料をAIが自動分析。投資判断をサポート。",
+    title: "イリスのIR分析 | AI IR Insight",
+    description: "2050年から来たAIアナリスト「イリス」が、IR資料をわかりやすく解説。",
+    images: ["/images/og-image.png"],
   },
   robots: {
     index: true,
     follow: true,
-  },
-  alternates: {
-    canonical: SITE_URL,
   },
 };
 
@@ -65,8 +69,11 @@ export default function RootLayout({
         className={`${geistSans.variable} ${geistMono.variable} antialiased bg-gray-50`}
       >
         <AuthProvider>
-          <Header />
-          <main className="min-h-screen">{children}</main>
+          <WatchlistProvider>
+            <Header />
+            <main className="min-h-screen fade-in-up">{children}</main>
+            <Footer />
+          </WatchlistProvider>
         </AuthProvider>
       </body>
     </html>

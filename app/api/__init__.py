@@ -17,6 +17,8 @@ from app.api.ml_prediction import router as ml_prediction_router
 from app.api.backtest import router as backtest_router
 from app.api.portfolio import router as portfolio_router
 from app.api.technical import router as technical_router
+from app.api.scheduler import router as scheduler_router
+from app.api.notifications import router as notifications_router
 
 __all__ = [
     "companies_router",
@@ -38,4 +40,6 @@ __all__ = [
     "backtest_router",
     "portfolio_router",
     "technical_router",
+    "scheduler_router",
+    "notifications_router",
 ] 

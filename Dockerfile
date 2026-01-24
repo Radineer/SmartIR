@@ -1,31 +1,27 @@
 FROM python:3.11-slim
 
-# 必要なパッケージのインストール
+WORKDIR /app
+
+# システム依存関係
 RUN apt-get update && apt-get install -y \
-    build-essential \
+    gcc \
     libpq-dev \
     tesseract-ocr \
     tesseract-ocr-jpn \
+    poppler-utils \
     && rm -rf /var/lib/apt/lists/*
 
-# 作業ディレクトリの設定
-WORKDIR /app
-
-# 依存関係ファイルのコピー
+# Python依存関係
 COPY requirements.txt .
-
-# 依存関係のインストール
 RUN pip install --no-cache-dir -r requirements.txt
 
-# アプリケーションのコピー
-COPY . .
+# アプリケーションコード
+COPY app/ ./app/
+COPY migrations/ ./migrations/
+COPY alembic.ini .
 
-# 環境変数の設定
-ENV PYTHONPATH=/app
-ENV PYTHONUNBUFFERED=1
-
-# ポートの公開
+# ポート公開
 EXPOSE 8000
 
-# サーバーの起動
-CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000"] 
+# 起動コマンド
+CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000"]

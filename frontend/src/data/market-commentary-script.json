@@ -1,0 +1,252 @@
+{
+  "meta": {
+    "title": "イリスの市況解説",
+    "date": "2026-01-10",
+    "total_duration_seconds": 420,
+    "character": {
+      "name": "イリス",
+      "personality": "知的でクールだが親しみやすい",
+      "first_person": "私",
+      "speech_style": "です/ますベース"
+    },
+    "version": "1.0.0"
+  },
+  "segments": [
+    {
+      "id": "opening",
+      "title": "オープニング",
+      "time_range": "0:00-0:15",
+      "duration_seconds": 15,
+      "expression": "happy",
+      "chart_type": null,
+      "background": "studio_default",
+      "text": "こんにちは、イリスです。本日も市場の動きを分かりやすくお届けしますね。今日は日本市場の全体動向から、注目セクター、個別銘柄、そして海外市場まで、まるっと解説していきます。それでは早速、今日のマーケットを見ていきましょう。"
+    },
+    {
+      "id": "market_summary",
+      "title": "本日の市場サマリー",
+      "time_range": "0:15-1:30",
+      "duration_seconds": 75,
+      "expression": "neutral",
+      "chart_type": "nikkei_topix_line",
+      "background": "chart_overlay",
+      "subsections": [
+        {
+          "id": "nikkei",
+          "label": "日経平均",
+          "duration_seconds": 25,
+          "expression": "neutral",
+          "text": "まずは日経平均株価から。本日の終値は39,850円、前日比でプラス285円、0.72%の上昇となりました。朝方は米国市場の堅調な流れを受けて買いが先行し、39,900円台まで上昇する場面もありましたが、午後は利益確定売りに押されて上げ幅を縮小しています。"
+        },
+        {
+          "id": "topix",
+          "label": "TOPIX",
+          "duration_seconds": 25,
+          "expression": "neutral",
+          "text": "TOPIXも同様の動きを見せています。終値は2,785ポイント、前日比プラス18ポイント、0.65%の上昇です。東証プライム市場では、値上がり銘柄数が1,200を超え、全体の65%が上昇という展開でした。"
+        },
+        {
+          "id": "weekly_comparison",
+          "label": "週間比較",
+          "duration_seconds": 25,
+          "expression": "happy",
+          "text": "週間で見ると、日経平均は先週末比でプラス1.8%と堅調な推移です。年初からの上昇率は約3.2%。新年のご祝儀相場が続いている印象ですね。ただし、来週以降は利益確定売りも出やすい水準ですので、注意が必要です。"
+        }
+      ]
+    },
+    {
+      "id": "sector_analysis",
+      "title": "注目セクター分析",
+      "time_range": "1:30-3:00",
+      "duration_seconds": 90,
+      "expression": "neutral",
+      "chart_type": "sector_heatmap",
+      "background": "chart_overlay",
+      "subsections": [
+        {
+          "id": "top_sectors",
+          "label": "上昇セクターTOP3",
+          "duration_seconds": 40,
+          "expression": "happy",
+          "text": "では、セクター別の動きを見ていきましょう。上昇率トップは半導体関連、プラス2.8%です。米エヌビディアの好決算を受けて、東京エレクトロンやレーザーテックに買いが集中しました。2位は銀行業のプラス1.9%。長期金利の上昇期待から、メガバンクを中心に堅調でした。3位は商社セクターでプラス1.5%。資源価格の上昇を背景に、三菱商事や三井物産が買われています。"
+        },
+        {
+          "id": "bottom_sectors",
+          "label": "下落セクターTOP3",
+          "duration_seconds": 30,
+          "expression": "concerned",
+          "text": "一方、下落したセクターも確認しておきましょう。ワースト1位は不動産業でマイナス1.2%。金利上昇への警戒感から売りが優勢でした。2位はREITでマイナス0.8%。3位は医薬品セクターでマイナス0.5%となっています。"
+        },
+        {
+          "id": "sector_background",
+          "label": "背景解説",
+          "duration_seconds": 20,
+          "expression": "neutral",
+          "text": "今日のセクター動向を一言でまとめると、「金利敏感株が二極化」という表現がぴったりですね。銀行など金利上昇メリット銘柄が買われる一方、不動産やREITなど金利上昇デメリット銘柄には売り圧力がかかっています。"
+        }
+      ]
+    },
+    {
+      "id": "individual_stocks",
+      "title": "個別銘柄ピックアップ",
+      "time_range": "3:00-4:30",
+      "duration_seconds": 90,
+      "expression": "neutral",
+      "chart_type": "stock_chart",
+      "background": "chart_overlay",
+      "subsections": [
+        {
+          "id": "stock_1",
+          "label": "注目銘柄1: トヨタ自動車(7203)",
+          "duration_seconds": 35,
+          "expression": "happy",
+          "ticker_code": "7203",
+          "company_name": "トヨタ自動車",
+          "text": "注目銘柄1つ目は、トヨタ自動車です。本日の終値は2,850円、前日比プラス2.1%でした。北米での電気自動車販売が好調で、アナリストの目標株価引き上げも相次いでいます。私の分析では、為替の円安傾向も追い風となっており、今期業績の上方修正期待が高まっている状況です。"
+        },
+        {
+          "id": "stock_2",
+          "label": "注目銘柄2: ソニーグループ(6758)",
+          "duration_seconds": 35,
+          "expression": "neutral",
+          "ticker_code": "6758",
+          "company_name": "ソニーグループ",
+          "text": "2つ目の注目銘柄は、ソニーグループです。終値は15,200円、前日比プラス1.3%。ゲーム部門の収益拡大と、イメージセンサー事業の回復が評価されています。決算発表を来月に控え、機関投資家の買い増しも観測されていますね。"
+        },
+        {
+          "id": "ai_comment",
+          "label": "AI分析コメント",
+          "duration_seconds": 20,
+          "expression": "thinking",
+          "text": "私のセンチメント分析によると、両銘柄ともIR資料のトーンはポジティブ傾向です。特にトヨタは経営陣のコメントに自信が感じられます。ただし、地政学リスクや為替変動には引き続き注意が必要ですね。"
+        }
+      ]
+    },
+    {
+      "id": "overseas_forex",
+      "title": "海外市場・為替",
+      "time_range": "4:30-5:30",
+      "duration_seconds": 60,
+      "expression": "neutral",
+      "chart_type": "world_markets",
+      "background": "chart_overlay",
+      "subsections": [
+        {
+          "id": "us_market",
+          "label": "米国市場動向",
+          "duration_seconds": 25,
+          "expression": "neutral",
+          "text": "続いて海外市場です。昨夜のNY市場は、ダウが150ドル高、ナスダックは0.9%上昇と、3日続伸で取引を終えました。テック株を中心に買いが入り、S&P500は過去最高値を更新しています。"
+        },
+        {
+          "id": "forex",
+          "label": "ドル円相場",
+          "duration_seconds": 20,
+          "expression": "neutral",
+          "text": "ドル円は現在156円20銭付近で推移しています。日銀の金融政策決定会合を来週に控え、やや円高方向への動きも見られますが、大きなトレンド変化はまだ確認できていません。"
+        },
+        {
+          "id": "outlook",
+          "label": "今後の見通し",
+          "duration_seconds": 15,
+          "expression": "thinking",
+          "text": "今夜は米国で消費者物価指数の発表があります。結果次第でFRBの利下げ観測が変わる可能性がありますので、明日の日本市場にも影響しそうです。"
+        }
+      ]
+    },
+    {
+      "id": "ai_analysis",
+      "title": "AI独自分析",
+      "time_range": "5:30-6:30",
+      "duration_seconds": 60,
+      "expression": "thinking",
+      "chart_type": "sentiment_gauge",
+      "background": "data_visualization",
+      "subsections": [
+        {
+          "id": "sentiment",
+          "label": "センチメント分析結果",
+          "duration_seconds": 20,
+          "expression": "neutral",
+          "text": "私が分析した市場センチメントをお伝えします。本日のIR資料や企業ニュースを解析した結果、ポジティブが58%、ニュートラルが32%、ネガティブが10%という配分になっています。全体として楽観ムードが優勢ですね。"
+        },
+        {
+          "id": "risk_factors",
+          "label": "市場のリスク要因",
+          "duration_seconds": 20,
+          "expression": "concerned",
+          "text": "ただし、リスク要因も把握しておく必要があります。第一に、中東情勢の不透明感による原油価格の変動。第二に、中国経済の減速懸念。第三に、日銀の金融政策変更の可能性です。これらは常に頭の片隅に置いておいてください。"
+        },
+        {
+          "id": "iris_view",
+          "label": "イリスの見解",
+          "duration_seconds": 20,
+          "expression": "confident",
+          "text": "私の総合的な見解としては、短期的には上昇トレンドが継続する可能性が高いと見ています。ただし、日経平均40,000円の大台は心理的な節目になりやすいので、この水準では一旦調整が入ることも想定しておくべきですね。"
+        }
+      ]
+    },
+    {
+      "id": "ending",
+      "title": "エンディング",
+      "time_range": "6:30-7:00",
+      "duration_seconds": 30,
+      "expression": "happy",
+      "chart_type": null,
+      "background": "studio_default",
+      "subsections": [
+        {
+          "id": "summary",
+          "label": "まとめ",
+          "duration_seconds": 12,
+          "expression": "neutral",
+          "text": "本日のまとめです。日経平均は堅調、半導体と銀行が牽引、海外市場も好調継続。短期的には強気維持ですが、来週の日銀会合には要注目です。"
+        },
+        {
+          "id": "next_preview",
+          "label": "次回予告",
+          "duration_seconds": 8,
+          "expression": "happy",
+          "text": "次回は決算シーズン直前スペシャルとして、注目企業の業績予想を深掘りしていきます。お楽しみに。"
+        },
+        {
+          "id": "subscribe",
+          "label": "チャンネル登録促進",
+          "duration_seconds": 10,
+          "expression": "happy",
+          "text": "この動画が参考になったら、ぜひチャンネル登録と高評価をお願いします。コメントでの質問もお待ちしています。それでは、また次の動画でお会いしましょう。イリスでした。"
+        }
+      ]
+    }
+  ],
+  "expressions_map": {
+    "happy": "笑顔・明るい表情",
+    "neutral": "落ち着いた表情",
+    "thinking": "考え込む表情・分析中",
+    "concerned": "心配・注意を促す表情",
+    "confident": "自信のある表情",
+    "surprised": "驚きの表情"
+  },
+  "chart_types_map": {
+    "nikkei_topix_line": "日経平均・TOPIXの日中チャート",
+    "sector_heatmap": "セクター別騰落率ヒートマップ",
+    "stock_chart": "個別銘柄のローソク足チャート",
+    "world_markets": "世界市場一覧（米国・欧州・アジア）",
+    "sentiment_gauge": "センチメント分析ゲージ（円グラフ）"
+  },
+  "production_notes": {
+    "audio": {
+      "bgm": "calm_corporate_loop",
+      "volume_ratio": "voice:80, bgm:20"
+    },
+    "transitions": {
+      "segment_change": "fade_with_slide",
+      "duration_ms": 500
+    },
+    "lower_thirds": {
+      "show_ticker": true,
+      "show_segment_title": true,
+      "position": "bottom_left"
+    }
+  }
+}
