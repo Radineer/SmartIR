@@ -20,7 +20,7 @@ from ta.trend import (
 from ta.momentum import (
     RSIIndicator, StochasticOscillator, WilliamsRIndicator,
     ROCIndicator, UltimateOscillator, TSIIndicator,
-    StochRSIIndicator, PPOIndicator
+    StochRSIIndicator
 )
 from ta.volatility import (
     BollingerBands, AverageTrueRange, KeltnerChannel,
@@ -1562,18 +1562,20 @@ class TechnicalIndicatorService:
             logger.error(f"Error calculating Stochastic RSI: {e}")
             return None
 
-    def calculate_ppo(self, df: pd.DataFrame) -> Optional[IndicatorResult]:
-        """PPO (Percentage Price Oscillator) を計算"""
+    def calculate_ppo(self, df: pd.DataFrame, fast: int = 12, slow: int = 26, signal: int = 9) -> Optional[IndicatorResult]:
+        """PPO (Percentage Price Oscillator) を計算 - 手動実装"""
         try:
-            indicator = PPOIndicator(close=df['close'])
-            ppo = indicator.ppo()
-            signal = indicator.ppo_signal()
+            close = df['close']
+            ema_fast = close.ewm(span=fast, adjust=False).mean()
+            ema_slow = close.ewm(span=slow, adjust=False).mean()
+            ppo = ((ema_fast - ema_slow) / ema_slow) * 100
+            ppo_signal = ppo.ewm(span=signal, adjust=False).mean()
 
-            if ppo is None:
+            if ppo.empty:
                 return None
 
             ppo_value = self._get_latest_value(ppo)
-            signal_value = self._get_latest_value(signal) if signal is not None else 0
+            signal_value = self._get_latest_value(ppo_signal)
 
             if ppo_value > signal_value and ppo_value > 0:
                 sig = "buy"
