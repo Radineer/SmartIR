@@ -6,6 +6,7 @@ from app.models.analysis import AnalysisResult
 from app.models.watchlist import Watchlist, WatchlistItem, PriceAlert, AlertType
 from app.models.backtest import BacktestJob, BacktestTemplate, BacktestStatus
 from app.models.notification import NotificationSettings, NotificationLog, NotificationChannel
+from app.models.post_log import PostLog, PostPlatform, PostType
 
 __all__ = [
     "BaseModel",
@@ -24,4 +25,7 @@ __all__ = [
     "NotificationSettings",
     "NotificationLog",
     "NotificationChannel",
+    "PostLog",
+    "PostPlatform",
+    "PostType",
 ]

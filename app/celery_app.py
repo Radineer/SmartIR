@@ -13,6 +13,7 @@ celery_app = Celery(
     include=[
         "app.tasks.crawler_tasks",
         "app.tasks.analysis_tasks",
+        "app.tasks.publish_tasks",
     ]
 )
 
@@ -53,5 +54,15 @@ celery_app.conf.beat_schedule = {
         "task": "app.tasks.analysis_tasks.analyze_unprocessed_documents",
         "schedule": crontab(minute="*/30"),
         "args": (10,),  # batch_size=10
+    },
+    # 日次まとめ (note + X): 毎日20:00 JST
+    "publish-daily-summary": {
+        "task": "app.tasks.publish_tasks.publish_daily_summary",
+        "schedule": crontab(hour=20, minute=0),
+    },
+    # 週次まとめ (X): 毎週日曜10:00 JST
+    "publish-weekly-summary": {
+        "task": "app.tasks.publish_tasks.publish_weekly_summary",
+        "schedule": crontab(hour=10, minute=0, day_of_week=0),
     },
 }

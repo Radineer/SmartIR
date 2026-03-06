@@ -19,6 +19,7 @@ from app.api.portfolio import router as portfolio_router
 from app.api.technical import router as technical_router
 from app.api.scheduler import router as scheduler_router
 from app.api.notifications import router as notifications_router
+from app.api.publish import router as publish_router
 
 __all__ = [
     "companies_router",
@@ -42,4 +43,5 @@ __all__ = [
     "technical_router",
     "scheduler_router",
     "notifications_router",
+    "publish_router",
 ] 

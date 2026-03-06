@@ -6,7 +6,7 @@ import os
 import logging
 from pathlib import Path
 
-from app.api import companies_router, documents_router, analysis_router, vtuber_router, auth_router, crawlers_router, public_router, tts_router, broadcast_router, video_studio_router, market_router, sadtalker_router, jquants_router, watchlist_router, sentiment_router, ml_prediction_router, backtest_router, portfolio_router, technical_router, scheduler_router, notifications_router
+from app.api import companies_router, documents_router, analysis_router, vtuber_router, auth_router, crawlers_router, public_router, tts_router, broadcast_router, video_studio_router, market_router, sadtalker_router, jquants_router, watchlist_router, sentiment_router, ml_prediction_router, backtest_router, portfolio_router, technical_router, scheduler_router, notifications_router, publish_router
 from app.services.scheduler_service import scheduler_service
 
 logger = logging.getLogger(__name__)
@@ -91,6 +91,7 @@ app.include_router(portfolio_router, prefix="/api", tags=["portfolio"])
 app.include_router(technical_router, prefix="/api", tags=["technical"])
 app.include_router(scheduler_router, prefix="/api", tags=["scheduler"])
 app.include_router(notifications_router, prefix="/api", tags=["notifications"])
+app.include_router(publish_router, prefix="/api", tags=["publish"])
 
 @app.get("/")
 async def root():
