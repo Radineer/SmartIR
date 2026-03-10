@@ -20,6 +20,7 @@ selenium==4.15.2
 # AI/ML
 openai==1.3.5
 langchain==0.0.335
+anthropic>=0.39
 
 # Utils
 python-dotenv==1.0.0

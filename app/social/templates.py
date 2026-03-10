@@ -105,6 +105,7 @@ def build_daily_tweet(
 def build_weekly_tweet(
     week_start: date,
     highlights: list[dict],
+    note_url: str = "",
 ) -> str:
     """週次まとめツイート
 
@@ -119,6 +120,67 @@ def build_weekly_tweet(
         lines.append(f"{emoji} {h['company_name']}({h['ticker_code']})")
 
     lines.append("")
+    if note_url:
+        lines.append(f"詳細 → {note_url}")
     lines.append("#週間決算 #IR分析 #SmartIR")
+
+    return _truncate("\n".join(lines))
+
+
+def build_industry_tweet(
+    sector: str,
+    note_url: str = "",
+) -> str:
+    """業界分析ツイート"""
+    lines = [
+        f"【業界分析】{sector}",
+        f"同セクター企業の決算をAIが横比較しました",
+    ]
+    if note_url:
+        lines.append("")
+        lines.append(f"詳細 → {note_url}")
+    lines.append("#業界分析 #IR分析 #SmartIR")
+
+    return _truncate("\n".join(lines))
+
+
+def build_weekly_trend_tweet(
+    week_start: date,
+    highlight_text: str = "",
+    note_url: str = "",
+) -> str:
+    """週次トレンドレポートツイート"""
+    date_str = week_start.strftime("%m/%d")
+
+    lines = [f"【週次トレンド】{date_str}〜"]
+    if highlight_text:
+        lines.append(highlight_text)
+    else:
+        lines.append("今週の決算トレンドをAIがまとめました")
+
+    if note_url:
+        lines.append("")
+        lines.append(f"レポート → {note_url}")
+    lines.append("#週次レポート #決算トレンド #SmartIR")
+
+    return _truncate("\n".join(lines))
+
+
+def build_earnings_calendar_tweet(
+    target_date: date,
+    company_count: int,
+    note_url: str = "",
+) -> str:
+    """決算カレンダーツイート"""
+    date_str = target_date.strftime("%m/%d")
+
+    lines = [
+        f"【決算カレンダー】{date_str}",
+        f"本日{company_count}社の決算発表が予定されています",
+    ]
+    if note_url:
+        lines.append("")
+        lines.append(f"プレビュー → {note_url}")
+    lines.append("#決算カレンダー #IR分析 #SmartIR")
 
     return _truncate("\n".join(lines))

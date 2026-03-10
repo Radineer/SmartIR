@@ -1,0 +1,162 @@
+name: SmartIR Publish (note.com + X)
+
+on:
+  schedule:
+    # Morning: 9:00 JST = 0:00 UTC (weekdays) - breaking articles for new IR docs
+    - cron: '0 0 * * 1-5'
+    # Evening: 20:00 JST = 11:00 UTC (daily) - daily summary
+    - cron: '0 11 * * *'
+    # Weekly: Sunday 10:00 JST = 01:00 UTC - weekly trend report
+    - cron: '0 1 * * 0'
+  workflow_dispatch:
+    inputs:
+      job:
+        description: 'Job to run'
+        required: true
+        type: choice
+        options:
+          - morning
+          - evening
+          - weekly
+      date:
+        description: 'Target date (YYYY-MM-DD), defaults to today'
+        required: false
+
+env:
+  PYTHONPATH: ${{ github.workspace }}
+
+jobs:
+  # ──────────────────────────────────────────────
+  # Morning: Publish breaking articles for new IR documents
+  # ──────────────────────────────────────────────
+  morning:
+    if: >-
+      github.event.schedule == '0 0 * * 1-5' ||
+      (github.event_name == 'workflow_dispatch' && inputs.job == 'morning')
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: pip
+
+      - name: Install dependencies
+        run: |
+          pip install -r requirements.txt
+          pip install playwright anthropic
+          playwright install chromium --with-deps
+
+      - name: Publish breaking articles (auto-detect new docs)
+        env:
+          DATABASE_URL: ${{ secrets.SUPABASE_DB_URL }}
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          NOTE_EMAIL: ${{ secrets.NOTE_EMAIL }}
+          NOTE_PASSWORD: ${{ secrets.NOTE_PASSWORD }}
+        run: python scripts/run_morning_publish.py
+        timeout-minutes: 20
+
+      - name: Tweet breaking news
+        env:
+          DATABASE_URL: ${{ secrets.SUPABASE_DB_URL }}
+          TWITTER_API_KEY: ${{ secrets.TWITTER_API_KEY }}
+          TWITTER_API_SECRET: ${{ secrets.TWITTER_API_SECRET }}
+          TWITTER_ACCESS_TOKEN: ${{ secrets.TWITTER_ACCESS_TOKEN }}
+          TWITTER_ACCESS_SECRET: ${{ secrets.TWITTER_ACCESS_SECRET }}
+        run: python scripts/run_morning_tweet.py
+        continue-on-error: true
+
+  # ──────────────────────────────────────────────
+  # Evening: Daily summary article + tweet
+  # ──────────────────────────────────────────────
+  evening:
+    if: >-
+      github.event.schedule == '0 11 * * *' ||
+      (github.event_name == 'workflow_dispatch' && inputs.job == 'evening')
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: pip
+
+      - name: Install dependencies
+        run: |
+          pip install -r requirements.txt
+          pip install playwright anthropic
+          playwright install chromium --with-deps
+
+      - name: Publish daily summary to note.com
+        env:
+          DATABASE_URL: ${{ secrets.SUPABASE_DB_URL }}
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          NOTE_EMAIL: ${{ secrets.NOTE_EMAIL }}
+          NOTE_PASSWORD: ${{ secrets.NOTE_PASSWORD }}
+        run: |
+          if [ -n "${{ github.event.inputs.date }}" ]; then
+            python -m app.cli publish daily --date "${{ github.event.inputs.date }}"
+          else
+            python -m app.cli publish daily
+          fi
+
+      - name: Tweet daily summary
+        env:
+          DATABASE_URL: ${{ secrets.SUPABASE_DB_URL }}
+          TWITTER_API_KEY: ${{ secrets.TWITTER_API_KEY }}
+          TWITTER_API_SECRET: ${{ secrets.TWITTER_API_SECRET }}
+          TWITTER_ACCESS_TOKEN: ${{ secrets.TWITTER_ACCESS_TOKEN }}
+          TWITTER_ACCESS_SECRET: ${{ secrets.TWITTER_ACCESS_SECRET }}
+        run: |
+          if [ -n "${{ github.event.inputs.date }}" ]; then
+            python -m app.cli tweet daily --date "${{ github.event.inputs.date }}"
+          else
+            python -m app.cli tweet daily
+          fi
+        continue-on-error: true
+
+  # ──────────────────────────────────────────────
+  # Weekly: Trend report + tweet (Sunday)
+  # ──────────────────────────────────────────────
+  weekly:
+    if: >-
+      github.event.schedule == '0 1 * * 0' ||
+      (github.event_name == 'workflow_dispatch' && inputs.job == 'weekly')
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: pip
+
+      - name: Install dependencies
+        run: |
+          pip install -r requirements.txt
+          pip install playwright anthropic
+          playwright install chromium --with-deps
+
+      - name: Publish weekly trend report to note.com
+        env:
+          DATABASE_URL: ${{ secrets.SUPABASE_DB_URL }}
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          NOTE_EMAIL: ${{ secrets.NOTE_EMAIL }}
+          NOTE_PASSWORD: ${{ secrets.NOTE_PASSWORD }}
+        run: python -m app.cli publish weekly
+
+      - name: Tweet weekly summary
+        env:
+          DATABASE_URL: ${{ secrets.SUPABASE_DB_URL }}
+          TWITTER_API_KEY: ${{ secrets.TWITTER_API_KEY }}
+          TWITTER_API_SECRET: ${{ secrets.TWITTER_API_SECRET }}
+          TWITTER_ACCESS_TOKEN: ${{ secrets.TWITTER_ACCESS_TOKEN }}
+          TWITTER_ACCESS_SECRET: ${{ secrets.TWITTER_ACCESS_SECRET }}
+        run: python -m app.cli tweet weekly
+        continue-on-error: true

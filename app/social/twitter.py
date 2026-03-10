@@ -115,21 +115,30 @@ class TwitterClient:
         db: Session,
         text: str,
         target_date: date,
+        post_type: PostType = PostType.DAILY_SUMMARY,
         dry_run: bool = False,
     ) -> str | None:
-        """Post a daily/weekly summary tweet (no document_id)."""
-        # Check for duplicate by date
+        """Post a summary tweet (daily/weekly/industry) with deduplication.
+
+        Args:
+            db: Database session
+            text: Tweet text
+            target_date: Date for deduplication
+            post_type: Type of post (DAILY_SUMMARY, WEEKLY_SUMMARY, INDUSTRY, etc.)
+            dry_run: Preview without posting
+        """
+        # Check for duplicate by date + post_type
         existing = (
             db.query(PostLog)
             .filter(
                 PostLog.platform == PostPlatform.TWITTER,
-                PostLog.post_type == PostType.DAILY_SUMMARY,
-                PostLog.content_preview.like(f"%{target_date.isoformat()}%"),
+                PostLog.post_type == post_type,
+                PostLog.metadata_["date"].astext == target_date.isoformat(),
             )
             .first()
         )
         if existing:
-            log.info("Daily tweet already posted for %s", target_date)
+            log.info("Tweet already posted for %s (type=%s)", target_date, post_type.value)
             return None
 
         if dry_run:
@@ -141,7 +150,7 @@ class TwitterClient:
 
         post_log = PostLog(
             platform=PostPlatform.TWITTER,
-            post_type=PostType.DAILY_SUMMARY,
+            post_type=post_type,
             external_id=tweet_id,
             content_preview=text[:200],
             metadata_={"date": target_date.isoformat()},
@@ -149,5 +158,5 @@ class TwitterClient:
         db.add(post_log)
         db.commit()
 
-        log.info("Daily tweet posted (id=%s)", tweet_id)
+        log.info("%s tweet posted (id=%s)", post_type.value, tweet_id)
         return tweet_id

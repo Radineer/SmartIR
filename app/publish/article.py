@@ -196,6 +196,120 @@ class ArticleGenerator:
             price=0,
         )
 
+    def generate_breaking_article(
+        self,
+        document: Document,
+        company: Company,
+    ) -> ArticleContent:
+        """決算速報記事（無料）を生成"""
+        title = f"【速報】{company.name}({company.ticker_code}) {document.title or '決算発表'} - {BRAND}"
+        parts = [
+            f"<h2>{company.name}({company.ticker_code}) 決算速報</h2>",
+            f"<p>{document.title or '決算短信'}が発表されました。</p>",
+            "<p>AI分析を準備中です。詳細な分析結果は後ほど公開予定です。</p>",
+            "<hr>",
+            f"<p>{BRAND} - AI搭載IR分析サービス</p>",
+        ]
+        return ArticleContent(
+            title=title,
+            body_html="\n".join(parts),
+            hashtags=["速報", "決算", company.name, company.ticker_code or "", BRAND],
+            price=0,
+        )
+
+    def generate_weekly_trend(
+        self,
+        week_start: date,
+        analyses: list[tuple[Document, AnalysisResult, Company]],
+    ) -> ArticleContent:
+        """週次トレンドレポート（無料）を生成"""
+        n = len(analyses)
+        start_str = week_start.strftime("%Y/%m/%d")
+        title = f"【週次レポート】{start_str}〜 決算トレンド - {BRAND}"
+
+        parts = [
+            f"<h2>{start_str}〜 週間決算トレンド</h2>",
+            f"<p>今週{n}社の決算が発表されました。</p>",
+        ]
+        for doc, analysis, company in analyses[:10]:
+            emoji = _sentiment_emoji(analysis)
+            label = _sentiment_label(analysis)
+            parts.append(f"<h3>{emoji} {company.name}({company.ticker_code})</h3>")
+            parts.append(f"<p>センチメント: <strong>{label}</strong></p>")
+            summary = (analysis.summary or "")[:150]
+            if summary:
+                parts.append(f"<p>{summary}</p>")
+            parts.append("<hr>")
+        parts.append(f"<p>{BRAND} - AI搭載IR分析サービス</p>")
+
+        return ArticleContent(
+            title=title,
+            body_html="\n".join(parts),
+            hashtags=["週間決算", "決算トレンド", "IR分析", BRAND],
+            price=0,
+        )
+
+    def generate_industry_comparison(
+        self,
+        sector: str,
+        analyses: list[tuple[Document, AnalysisResult, Company]],
+    ) -> ArticleContent:
+        """業界比較記事（無料）を生成"""
+        n = len(analyses)
+        title = f"【業界分析】{sector} {n}社の決算比較 - {BRAND}"
+
+        parts = [
+            f"<h2>{sector} 業界決算比較</h2>",
+            f"<p>{sector}セクターの{n}社の決算をAIが分析・比較しました。</p>",
+        ]
+        for doc, analysis, company in analyses:
+            emoji = _sentiment_emoji(analysis)
+            label = _sentiment_label(analysis)
+            parts.append(f"<h3>{emoji} {company.name}({company.ticker_code})</h3>")
+            parts.append(f"<p>センチメント: <strong>{label}</strong></p>")
+            summary = (analysis.summary or "")[:200]
+            if summary:
+                parts.append(f"<p>{summary}</p>")
+            parts.append("<hr>")
+        parts.append(f"<p>{BRAND} - AI搭載IR分析サービス</p>")
+
+        return ArticleContent(
+            title=title,
+            body_html="\n".join(parts),
+            hashtags=[sector, "業界分析", "決算比較", "IR分析", BRAND],
+            price=0,
+        )
+
+    def generate_earnings_calendar(
+        self,
+        target_date: date,
+        companies: list[Company],
+    ) -> ArticleContent:
+        """決算カレンダー記事（無料）を生成"""
+        n = len(companies)
+        date_str = target_date.strftime("%Y/%m/%d")
+        title = f"【決算カレンダー】{date_str} 発表予定{n}社 - {BRAND}"
+
+        parts = [
+            f"<h2>{date_str} 決算発表予定</h2>",
+            f"<p>本日{n}社の決算発表が予定されています。</p>",
+            "<h3>発表予定企業</h3>",
+            "<ul>",
+        ]
+        for c in companies:
+            parts.append(f"<li>{c.name}（{c.ticker_code}）- {c.sector or '不明'}</li>")
+        parts.append("</ul>")
+        parts.append("<p>決算発表後、AIによる分析記事を順次公開予定です。</p>")
+        parts.append("<hr>")
+        parts.append(f"<p>{BRAND} - AI搭載IR分析サービス</p>")
+
+        return ArticleContent(
+            title=title,
+            body_html="\n".join(parts),
+            hashtags=["決算カレンダー", "決算予定", "IR分析", BRAND],
+            price=0,
+        )
+
     def _generate_hashtags(self, company: Company) -> list[str]:
         tags = ["決算", "IR分析", "AI分析", BRAND]
         if company.name:

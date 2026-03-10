@@ -62,12 +62,55 @@ class NotePublishError(Exception):
 
 
 class NoteClient:
-    """Client for note.com: handles login, session management, and article publishing."""
+    """Client for note.com: handles login, session management, and article publishing.
+
+    Supports shared browser context for batch publishing (reuse one Playwright
+    browser instance across multiple articles) via async context manager.
+    """
 
     def __init__(self, session_path: Path | None = None) -> None:
         self._session_path = session_path or SESSION_PATH
         self._cookies: dict[str, str] = {}
         self._xsrf_token: str = ""
+        self._shared_browser = None
+        self._shared_context = None
+        self._playwright = None
+
+    async def __aenter__(self):
+        """Open shared browser context for batch publishing."""
+        try:
+            from playwright.async_api import async_playwright
+            self._playwright = await async_playwright().start()
+            self._shared_browser = await self._playwright.chromium.launch(
+                headless=True,
+                args=["--disable-blink-features=AutomationControlled", "--no-sandbox"],
+            )
+            self._shared_context = await self._shared_browser.new_context(
+                user_agent=USER_AGENT,
+                viewport={"width": 1280, "height": 800},
+                locale="ja-JP",
+            )
+            if self._cookies:
+                cookie_list = [
+                    {"name": name, "value": value, "domain": ".note.com", "path": "/"}
+                    for name, value in self._cookies.items()
+                ]
+                await self._shared_context.add_cookies(cookie_list)
+            log.info("Shared browser context opened for batch publishing")
+        except ImportError:
+            log.warning("playwright not available, batch mode disabled")
+        return self
+
+    async def __aexit__(self, exc_type, exc_val, exc_tb):
+        """Close shared browser context."""
+        if self._shared_browser:
+            await self._shared_browser.close()
+            self._shared_browser = None
+            self._shared_context = None
+        if self._playwright:
+            await self._playwright.stop()
+            self._playwright = None
+        log.info("Shared browser context closed")
 
     def _save_session(self) -> None:
         self._session_path.parent.mkdir(parents=True, exist_ok=True)
@@ -253,11 +296,35 @@ class NoteClient:
                 )
             log.info("Draft content saved (id=%s)", draft_id)
 
+    async def _set_eyecatch(self, page, eyecatch_path: str) -> None:
+        """Set the eyecatch (OGP) image on the publish settings page."""
+        try:
+            file_input = await page.query_selector('input[type="file"]')
+            if not file_input:
+                # Try finding via label
+                labels = await page.query_selector_all("label")
+                for label in labels:
+                    text = (await label.text_content() or "").strip()
+                    if "見出し画像" in text or "アイキャッチ" in text or "画像" in text:
+                        file_input = await label.query_selector('input[type="file"]')
+                        if file_input:
+                            break
+
+            if file_input:
+                await file_input.set_input_files(eyecatch_path)
+                await asyncio.sleep(2)
+                log.info("Eyecatch image set: %s", eyecatch_path)
+            else:
+                log.warning("Eyecatch file input not found")
+        except Exception as e:
+            log.warning("Failed to set eyecatch image: %s", e)
+
     async def _publish_via_editor(
         self,
         draft_key: str,
         price: int,
         hashtags: list[str] | None = None,
+        eyecatch_path: str | None = None,
     ) -> dict:
         try:
             from playwright.async_api import async_playwright
@@ -328,6 +395,9 @@ class NoteClient:
                 await asyncio.sleep(3)
                 await page.wait_for_load_state("networkidle")
                 await asyncio.sleep(2)
+
+                if eyecatch_path:
+                    await self._set_eyecatch(page, eyecatch_path)
 
                 if hashtags:
                     await self._set_hashtags(page, hashtags)
@@ -456,6 +526,8 @@ class NoteClient:
         html_body: str,
         price: int | None = None,
         hashtags: list[str] | None = None,
+        eyecatch_path: str | None = None,
+        article_type: str | None = None,
     ) -> dict:
         """Create and publish an article on note.com.
 
@@ -464,6 +536,10 @@ class NoteClient:
             html_body: HTML body content (with <pay> tag for paid section)
             price: Price in JPY (0 = free, default from NOTE_DEFAULT_PRICE)
             hashtags: List of hashtag strings
+            eyecatch_path: Path to eyecatch image. If None and article_type is set,
+                          auto-generates using eyecatch module.
+            article_type: Article type for auto eyecatch generation
+                         (breaking, analysis, daily_summary, industry, weekly_trend, earnings_calendar)
 
         Returns:
             Dict containing publish result info including note_url.
@@ -473,11 +549,23 @@ class NoteClient:
 
         log.info("Publishing article: %s (price=%d yen)", title, price)
 
+        # Auto-generate eyecatch if not provided
+        if eyecatch_path is None and article_type:
+            try:
+                from app.publish.eyecatch import generate_eyecatch
+                path = await generate_eyecatch(title, article_type)
+                if path:
+                    eyecatch_path = str(path)
+            except Exception as e:
+                log.warning("Eyecatch auto-generation failed: %s", e)
+
         draft = await self._create_draft()
         await self._save_draft_content(draft["id"], title, html_body, hashtags)
 
         try:
-            result = await self._publish_via_editor(draft["key"], price, hashtags)
+            result = await self._publish_via_editor(
+                draft["key"], price, hashtags, eyecatch_path,
+            )
         except Exception as e:
             log.error("Playwright publish failed: %s", e)
             raise NotePublishError(

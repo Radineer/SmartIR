@@ -19,6 +19,9 @@ class PostType(str, enum.Enum):
     ANALYSIS = "analysis"
     DAILY_SUMMARY = "daily"
     WEEKLY_SUMMARY = "weekly"
+    INDUSTRY = "industry"
+    WEEKLY_TREND = "weekly_trend"
+    EARNINGS_CALENDAR = "earnings_calendar"
 
 
 class PostLog(BaseModel):
