@@ -2,11 +2,8 @@ name: SmartIR Publish (note.com + X)
 
 on:
   schedule:
-    # Morning: 9:00 JST = 0:00 UTC (weekdays) - breaking articles for new IR docs
     - cron: '0 0 * * 1-5'
-    # Evening: 20:00 JST = 11:00 UTC (daily) - daily summary
     - cron: '0 11 * * *'
-    # Weekly: Sunday 10:00 JST = 01:00 UTC - weekly trend report
     - cron: '0 1 * * 0'
   workflow_dispatch:
     inputs:
@@ -21,13 +18,14 @@ on:
       date:
         description: 'Target date (YYYY-MM-DD), defaults to today'
         required: false
+        type: string
 
 env:
   PYTHONPATH: ${{ github.workspace }}
 
 jobs:
   morning:
-    if: github.event.schedule == '0 0 * * 1-5' || (github.event_name == 'workflow_dispatch' && github.event.inputs.job == 'morning')
+    if: github.event.schedule == '0 0 * * 1-5' || github.event.inputs.job == 'morning'
     runs-on: ubuntu-latest
     timeout-minutes: 30
     steps:
@@ -64,7 +62,7 @@ jobs:
         continue-on-error: true
 
   evening:
-    if: github.event.schedule == '0 11 * * *' || (github.event_name == 'workflow_dispatch' && github.event.inputs.job == 'evening')
+    if: github.event.schedule == '0 11 * * *' || github.event.inputs.job == 'evening'
     runs-on: ubuntu-latest
     timeout-minutes: 30
     steps:
@@ -111,7 +109,7 @@ jobs:
         continue-on-error: true
 
   weekly:
-    if: github.event.schedule == '0 1 * * 0' || (github.event_name == 'workflow_dispatch' && github.event.inputs.job == 'weekly')
+    if: github.event.schedule == '0 1 * * 0' || github.event.inputs.job == 'weekly'
     runs-on: ubuntu-latest
     timeout-minutes: 30
     steps:
