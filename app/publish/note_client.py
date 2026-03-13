@@ -298,14 +298,41 @@ class NoteClient:
 
     async def _dismiss_modals(self, page) -> None:
         """Dismiss any popup modals/dialogs that might block interaction."""
+        # ReactModal overlays (MessageModal, etc.)
+        try:
+            overlays = await page.query_selector_all('.ReactModal__Overlay')
+            for overlay in overlays:
+                if await overlay.is_visible():
+                    # Find close button within the modal
+                    close_btn = await overlay.query_selector(
+                        'button[aria-label="閉じる"], button[aria-label="Close"], '
+                        'button:has-text("閉じる"), button:has-text("OK"), '
+                        'button:has-text("あとで"), button:has-text("スキップ"), '
+                        'button:has-text("次へ"), button:has-text("とじる")'
+                    )
+                    if close_btn:
+                        await close_btn.click()
+                        await asyncio.sleep(1)
+                        log.info("Dismissed ReactModal via button")
+                        continue
+                    # If no button found, click the overlay background to dismiss
+                    await overlay.click(position={"x": 5, "y": 5})
+                    await asyncio.sleep(1)
+                    log.info("Dismissed ReactModal via overlay click")
+        except Exception as e:
+            log.debug("ReactModal dismiss attempt: %s", e)
+
+        # Generic modal close selectors
         modal_close_selectors = [
             'button[aria-label="閉じる"]',
             'button[aria-label="Close"]',
             'button:has-text("閉じる")',
             'button:has-text("OK")',
             'button:has-text("あとで")',
+            'button:has-text("スキップ")',
             '[class*="modal"] button[class*="close"]',
             '[class*="dialog"] button[class*="close"]',
+            '.ReactModalPortal button',
         ]
         for selector in modal_close_selectors:
             try:
@@ -378,7 +405,10 @@ class NoteClient:
         except ImportError:
             raise NotePublishError("playwright が必要です")
 
-        editor_url = f"{NOTE_EDITOR_BASE}/notes/{draft_key}/edit/"
+        # APIで下書き保存済みなら、直接publish設定ページへ遷移可能
+        # /edit/ → 「公開に進む」、/publish/ → 「投稿する」（設定画面）
+        publish_settings_url = f"{NOTE_EDITOR_BASE}/notes/{draft_key}/publish/"
+        editor_url = f"{NOTE_BASE_URL}/notes/{draft_key}/edit"
         log.info("Opening editor: %s", editor_url)
 
         result: dict[str, object] = {}
@@ -421,30 +451,18 @@ class NoteClient:
 
                 page.on("response", on_response)
 
-                await page.goto(editor_url)
+                # コンテンツはAPI経由で保存済みなので、直接publish設定ページへ遷移
+                # /publish/ ページには「投稿する」ボタンがある
+                log.info("Navigating to publish settings: %s", publish_settings_url)
+                await page.goto(publish_settings_url)
                 await asyncio.sleep(3)
                 await page.wait_for_load_state("networkidle")
                 await asyncio.sleep(3)
 
-                try:
-                    await page.wait_for_selector(EDITOR_BODY_SELECTOR, timeout=15000)
-                except Exception:
-                    raise NotePublishError(
-                        "エディタが読み込めませんでした。セッションが無効かもしれません。"
-                    )
-
-                # Dismiss any modals before proceeding
-                await self._dismiss_modals(page)
-
-                # Click "公開に進む"
-                publish_btn = await self._find_button(page, ["公開に進む", "公開設定", "公開"])
-                if not publish_btn:
-                    raise NotePublishError("公開ボタンが見つかりませんでした。")
-
-                await publish_btn.click()
-                await asyncio.sleep(3)
-                await page.wait_for_load_state("networkidle")
-                await asyncio.sleep(2)
+                # Dismiss any modals
+                for _ in range(3):
+                    await self._dismiss_modals(page)
+                    await asyncio.sleep(1)
 
                 if eyecatch_path:
                     await self._set_eyecatch(page, eyecatch_path)
@@ -456,14 +474,29 @@ class NoteClient:
                     await self._set_paid_settings(page, price)
 
                 # Dismiss any modals before final publish
-                await self._dismiss_modals(page)
+                for _ in range(3):
+                    await self._dismiss_modals(page)
+                    await asyncio.sleep(1)
 
                 # Click "投稿する"
                 final_btn = await self._find_button(page, ["投稿する", "投稿", "公開する", "公開"])
                 if not final_btn:
                     raise NotePublishError("投稿ボタンが見つかりませんでした。")
 
-                await final_btn.click()
+                for attempt in range(3):
+                    try:
+                        await final_btn.click(timeout=10000)
+                        break
+                    except Exception as click_err:
+                        log.warning("Final click attempt %d failed: %s", attempt + 1, click_err)
+                        await self._dismiss_modals(page)
+                        await asyncio.sleep(2)
+                        final_btn = await self._find_button(page, ["投稿する", "投稿", "公開する", "公開"])
+                        if not final_btn:
+                            raise NotePublishError("投稿ボタンが見つかりませんでした。")
+                        if attempt == 2:
+                            await final_btn.evaluate("el => el.click()")
+
                 await asyncio.sleep(5)
 
                 result["draft_key"] = draft_key
