@@ -500,6 +500,8 @@ class NoteClient:
                 await asyncio.sleep(5)
 
                 result["draft_key"] = draft_key
+                urlname = ""
+
                 if publish_response:
                     result["api_response"] = publish_response
                     put_data = publish_response.get("data", {})
@@ -508,12 +510,14 @@ class NoteClient:
                         user = data_inner.get("user", {})
                         urlname = user.get("urlname", "")
                         key = data_inner.get("key", draft_key)
-                        if urlname:
-                            result["note_url"] = f"{NOTE_BASE_URL}/{urlname}/n/{key}"
-                        else:
-                            result["note_url"] = f"{NOTE_BASE_URL}/n/{key}"
 
-                if "note_url" not in result:
+                # urlnameが取れなかった場合、creators/mine APIから取得
+                if not urlname:
+                    urlname = await self._get_urlname()
+
+                if urlname:
+                    result["note_url"] = f"{NOTE_BASE_URL}/{urlname}/n/{draft_key}"
+                else:
                     result["note_url"] = f"{NOTE_BASE_URL}/n/{draft_key}"
 
                 log.info("Publish complete. note_url=%s", result.get("note_url"))
@@ -522,6 +526,21 @@ class NoteClient:
                 await browser.close()
 
         return result
+
+    async def _get_urlname(self) -> str:
+        """creators/mine APIからurlnameを取得。"""
+        try:
+            async with httpx.AsyncClient(timeout=HTTP_TIMEOUT) as client:
+                resp = await client.get(
+                    f"{NOTE_BASE_URL}/api/v2/creators/mine",
+                    cookies=self._cookies,
+                    headers=API_HEADERS,
+                )
+                if resp.status_code == 200:
+                    return resp.json().get("data", {}).get("urlname", "")
+        except Exception as e:
+            log.warning("Failed to get urlname: %s", e)
+        return ""
 
     async def _find_button(self, page, text_options: list[str]):
         for text in text_options:
