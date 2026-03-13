@@ -1,0 +1,21 @@
+name: Verify Predictions
+
+on:
+  schedule:
+    # 毎日 10:00 JST (1:00 UTC) - 前日の株価で予測を検証
+    - cron: "0 1 * * 2-6"
+  workflow_dispatch:
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: pip
+      - run: pip install -r requirements.txt
+      - run: python scripts/run_verify_predictions.py
+        env:
+          DATABASE_URL: ${{ secrets.SUPABASE_DB_URL }}

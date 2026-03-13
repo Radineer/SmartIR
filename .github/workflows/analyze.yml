@@ -1,0 +1,66 @@
+name: AI Analysis (3-Phase)
+
+on:
+  schedule:
+    # Quick: 毎15分（速報）
+    - cron: "*/15 23,0-9 * * 1-5"
+  workflow_dispatch:
+    inputs:
+      batch_size:
+        description: "Number of documents to analyze"
+        required: false
+        default: "10"
+      depth:
+        description: "Analysis depth (quick/standard/deep)"
+        required: false
+        default: "standard"
+
+jobs:
+  # Phase 1: 速報分析 (Haiku) - 新着をすぐ処理
+  quick:
+    if: github.event_name == 'schedule' || github.event.inputs.depth == 'quick'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: pip
+      - run: pip install -r requirements.txt
+      - run: python scripts/run_analysis.py 20 quick
+        env:
+          DATABASE_URL: ${{ secrets.SUPABASE_DB_URL }}
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+
+  # Phase 2: 標準分析 (Sonnet) - Quick完了後に深掘り
+  standard:
+    if: github.event_name == 'workflow_dispatch' && github.event.inputs.depth == 'standard'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: pip
+      - run: pip install -r requirements.txt
+      - run: python scripts/run_analysis.py ${{ github.event.inputs.batch_size || '10' }} standard
+        env:
+          DATABASE_URL: ${{ secrets.SUPABASE_DB_URL }}
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+
+  # Phase 3: 深層分析 (Opus) - 手動実行のみ
+  deep:
+    if: github.event_name == 'workflow_dispatch' && github.event.inputs.depth == 'deep'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: pip
+      - run: pip install -r requirements.txt
+      - run: python scripts/run_analysis.py ${{ github.event.inputs.batch_size || '5' }} deep
+        env:
+          DATABASE_URL: ${{ secrets.SUPABASE_DB_URL }}
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+        timeout-minutes: 120

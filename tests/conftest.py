@@ -1,12 +1,17 @@
 import pytest
 from fastapi.testclient import TestClient
-from sqlalchemy import create_engine
+from sqlalchemy import create_engine, JSON
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.pool import StaticPool
 
 from app.main import app
 from app.core.database import get_db
 from app.models.base import Base
+
+# SQLiteでJSONBをJSONとして扱う（PostgreSQL専用型の互換対応）
+from sqlalchemy.dialects.postgresql import JSONB
+from sqlalchemy.dialects.sqlite.base import SQLiteTypeCompiler
+SQLiteTypeCompiler.visit_JSONB = SQLiteTypeCompiler.visit_JSON
 
 # テスト用SQLiteデータベース
 SQLALCHEMY_DATABASE_URL = "sqlite:///:memory:"
@@ -68,12 +73,12 @@ def sample_company(db_session):
 @pytest.fixture
 def sample_document(db_session, sample_company):
     """サンプルドキュメントデータ"""
-    from app.models.document import Document
+    from app.models.document import Document, DocumentType
 
     document = Document(
         company_id=sample_company.id,
         title="2024年度決算短信",
-        doc_type="financial_report",
+        doc_type=DocumentType.FINANCIAL_REPORT,
         publish_date="2024-01-15",
         source_url="https://example.com/report.pdf",
         is_processed=False,

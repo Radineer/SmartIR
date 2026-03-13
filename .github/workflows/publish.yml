@@ -2,9 +2,11 @@ name: SmartIR Publish (note.com + X)
 
 on:
   schedule:
-    - cron: '0 0 * * 1-5'
-    - cron: '0 11 * * *'
-    - cron: '0 1 * * 0'
+    - cron: '0 0 * * 1-5'   # Morning (09:00 JST weekdays)
+    - cron: '0 11 * * *'    # Evening (20:00 JST daily)
+    - cron: '0 1 * * 0'     # Weekly (10:00 JST Sunday)
+    - cron: '0 2 * * 1-5'   # Engagement (11:00 JST weekdays)
+    - cron: '0 5 * * 1,3,5' # Follow (14:00 JST Mon/Wed/Fri)
   workflow_dispatch:
     inputs:
       job:
@@ -15,6 +17,8 @@ on:
           - morning
           - evening
           - weekly
+          - engage
+          - follow
       date:
         description: 'Target date (YYYY-MM-DD), defaults to today'
         required: false
@@ -142,4 +146,55 @@ jobs:
           TWITTER_ACCESS_TOKEN: ${{ secrets.TWITTER_ACCESS_TOKEN }}
           TWITTER_ACCESS_SECRET: ${{ secrets.TWITTER_ACCESS_SECRET }}
         run: python -m app.cli tweet weekly
+        continue-on-error: true
+
+  engage:
+    if: github.event.schedule == '0 2 * * 1-5' || github.event.inputs.job == 'engage'
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: pip
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Execute X engagement
+        env:
+          DATABASE_URL: ${{ secrets.SUPABASE_DB_URL }}
+          TWITTER_API_KEY: ${{ secrets.TWITTER_API_KEY }}
+          TWITTER_API_SECRET: ${{ secrets.TWITTER_API_SECRET }}
+          TWITTER_ACCESS_TOKEN: ${{ secrets.TWITTER_ACCESS_TOKEN }}
+          TWITTER_ACCESS_SECRET: ${{ secrets.TWITTER_ACCESS_SECRET }}
+        run: python -m app.cli engage run
+        continue-on-error: true
+
+  follow:
+    if: github.event.schedule == '0 5 * * 1,3,5' || github.event.inputs.job == 'follow'
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: pip
+
+      - name: Install dependencies
+        run: |
+          pip install -r requirements.txt
+          pip install playwright
+          playwright install chromium --with-deps
+
+      - name: Execute note.com auto-follow
+        env:
+          DATABASE_URL: ${{ secrets.SUPABASE_DB_URL }}
+          NOTE_EMAIL: ${{ secrets.NOTE_EMAIL }}
+          NOTE_PASSWORD: ${{ secrets.NOTE_PASSWORD }}
+        run: python -m app.cli follow run
         continue-on-error: true

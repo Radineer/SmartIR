@@ -63,16 +63,28 @@ def main():
                 continue
 
             note_url = log_entry.external_id or ""
-            text = build_analysis_tweet(company, analysis, note_url)
+            result = build_analysis_tweet(company, analysis, note_url)
 
             try:
-                twitter.post(
-                    db=db,
-                    text=text,
-                    post_type=PostType.ANALYSIS,
-                    document_id=doc.id,
-                    company_id=company.id,
-                )
+                if isinstance(result, tuple):
+                    # Link-reply pattern: main tweet + self-reply with link
+                    main_text, link_text = result
+                    twitter.post_tweet_with_link_reply(
+                        db=db,
+                        main_text=main_text,
+                        link_text=link_text,
+                        post_type=PostType.ANALYSIS,
+                        document_id=doc.id,
+                        company_id=company.id,
+                    )
+                else:
+                    twitter.post(
+                        db=db,
+                        text=result,
+                        post_type=PostType.ANALYSIS,
+                        document_id=doc.id,
+                        company_id=company.id,
+                    )
                 logger.info(f"Tweeted: {company.name}")
             except Exception as e:
                 logger.error(f"Tweet failed for {company.name}: {e}")

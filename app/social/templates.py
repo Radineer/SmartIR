@@ -59,8 +59,14 @@ def build_analysis_tweet(
     company: Company,
     analysis: AnalysisResult,
     note_url: str = "",
-) -> str:
-    """分析完了ツイート"""
+) -> tuple[str, str] | str:
+    """分析完了ツイート
+
+    Returns:
+        If note_url is provided: (main_text, link_reply_text) tuple
+        for the link-reply pattern (avoids external link penalty).
+        If no note_url: single tweet string.
+    """
     key = _get_sentiment_key(analysis)
     emoji = SENTIMENT_EMOJI.get(key, "➡️")
 
@@ -69,13 +75,15 @@ def build_analysis_tweet(
     lines = [
         f"【AI分析】{company.name}({company.ticker_code})",
         f"{emoji} {summary}",
+        f"#決算分析 #{company.ticker_code} #IR分析",
     ]
-    if note_url:
-        lines.append("")
-        lines.append(f"詳細分析 → {note_url}")
-    lines.append(f"#決算分析 #{company.ticker_code} #IR分析")
+    main_text = _truncate("\n".join(lines))
 
-    return _truncate("\n".join(lines))
+    if note_url:
+        link_text = f"詳細分析はこちら → {note_url}"
+        return main_text, link_text
+
+    return main_text
 
 
 def build_daily_tweet(

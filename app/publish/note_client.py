@@ -296,12 +296,43 @@ class NoteClient:
                 )
             log.info("Draft content saved (id=%s)", draft_id)
 
+    async def _dismiss_modals(self, page) -> None:
+        """Dismiss any popup modals/dialogs that might block interaction."""
+        modal_close_selectors = [
+            'button[aria-label="閉じる"]',
+            'button[aria-label="Close"]',
+            'button:has-text("閉じる")',
+            'button:has-text("OK")',
+            'button:has-text("あとで")',
+            '[class*="modal"] button[class*="close"]',
+            '[class*="dialog"] button[class*="close"]',
+        ]
+        for selector in modal_close_selectors:
+            try:
+                el = await page.query_selector(selector)
+                if el and await el.is_visible():
+                    await el.click()
+                    await asyncio.sleep(0.5)
+                    log.info("Dismissed modal via: %s", selector)
+            except Exception:
+                pass
+
     async def _set_eyecatch(self, page, eyecatch_path: str) -> None:
-        """Set the eyecatch (OGP) image on the publish settings page."""
+        """Set the eyecatch (OGP) image on the publish settings page.
+
+        Tries multiple approaches:
+        1. Standard file input
+        2. CDP-based file chooser (for hidden inputs)
+        3. Label-based discovery
+        """
+        await self._dismiss_modals(page)
+
         try:
+            # Approach 1: Direct file input
             file_input = await page.query_selector('input[type="file"]')
+
+            # Approach 2: Try finding via label
             if not file_input:
-                # Try finding via label
                 labels = await page.query_selector_all("label")
                 for label in labels:
                     text = (await label.text_content() or "").strip()
@@ -312,10 +343,26 @@ class NoteClient:
 
             if file_input:
                 await file_input.set_input_files(eyecatch_path)
-                await asyncio.sleep(2)
+                await asyncio.sleep(3)
                 log.info("Eyecatch image set: %s", eyecatch_path)
+                # Dismiss any crop/edit modal that may appear
+                await self._dismiss_modals(page)
             else:
-                log.warning("Eyecatch file input not found")
+                # Approach 3: CDP file chooser for dynamically created inputs
+                try:
+                    eyecatch_btn = await page.query_selector('[class*="eyecatch"], [class*="thumbnail"]')
+                    if eyecatch_btn:
+                        async with page.expect_file_chooser(timeout=5000) as fc_info:
+                            await eyecatch_btn.click()
+                        file_chooser = await fc_info.value
+                        await file_chooser.set_files(eyecatch_path)
+                        await asyncio.sleep(3)
+                        log.info("Eyecatch image set via file chooser: %s", eyecatch_path)
+                        await self._dismiss_modals(page)
+                    else:
+                        log.warning("Eyecatch file input not found")
+                except Exception as e2:
+                    log.warning("CDP file chooser also failed: %s", e2)
         except Exception as e:
             log.warning("Failed to set eyecatch image: %s", e)
 
@@ -386,6 +433,9 @@ class NoteClient:
                         "エディタが読み込めませんでした。セッションが無効かもしれません。"
                     )
 
+                # Dismiss any modals before proceeding
+                await self._dismiss_modals(page)
+
                 # Click "公開に進む"
                 publish_btn = await self._find_button(page, ["公開に進む", "公開設定", "公開"])
                 if not publish_btn:
@@ -404,6 +454,9 @@ class NoteClient:
 
                 if price > 0:
                     await self._set_paid_settings(page, price)
+
+                # Dismiss any modals before final publish
+                await self._dismiss_modals(page)
 
                 # Click "投稿する"
                 final_btn = await self._find_button(page, ["投稿する", "投稿", "公開する", "公開"])

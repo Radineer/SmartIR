@@ -619,5 +619,72 @@ def tweet_industry(sector: str, note_url: str, dry_run: bool):
         db.close()
 
 
+# ──────────────────────────────────────────────
+# engage commands
+# ──────────────────────────────────────────────
+
+@cli.group()
+def engage():
+    """X (Twitter) エンゲージメント自動化"""
+    pass
+
+
+@engage.command("run")
+@click.option("--dry-run", is_flag=True)
+def engage_run(dry_run: bool):
+    """エンゲージメントを実行（引用RT + リプライ + いいね）"""
+    db = SessionLocal()
+    try:
+        from app.social.engagement import execute_engagement
+        summary = execute_engagement(db=db, dry_run=dry_run)
+        click.echo(f"Engagement complete: {summary}")
+    finally:
+        db.close()
+
+
+@engage.command("stats")
+def engage_stats():
+    """本日のエンゲージメント統計"""
+    db = SessionLocal()
+    try:
+        from app.social.engagement import (
+            _get_engagement_count,
+            MAX_QUOTES_PER_DAY,
+            MAX_REPLIES_PER_DAY,
+            MAX_LIKES_PER_DAY,
+        )
+        today = date.today().isoformat()
+        click.echo(f"Date: {today}")
+        click.echo(f"Quotes: {_get_engagement_count(db, today, 'quote')}/{MAX_QUOTES_PER_DAY}")
+        click.echo(f"Replies: {_get_engagement_count(db, today, 'reply')}/{MAX_REPLIES_PER_DAY}")
+        click.echo(f"Likes: {_get_engagement_count(db, today, 'like')}/{MAX_LIKES_PER_DAY}")
+    finally:
+        db.close()
+
+
+# ──────────────────────────────────────────────
+# follow commands
+# ──────────────────────────────────────────────
+
+@cli.group()
+def follow():
+    """note.com 自動フォロー"""
+    pass
+
+
+@follow.command("run")
+@click.option("--max-follows", type=int, default=20, help="最大フォロー数")
+@click.option("--dry-run", is_flag=True)
+def follow_run(max_follows: int, dry_run: bool):
+    """note.com 自動フォローを実行"""
+    db = SessionLocal()
+    try:
+        from app.social.note_follow import execute_note_follow
+        result = _run_async(execute_note_follow(db=db, max_follows=max_follows, dry_run=dry_run))
+        click.echo(f"Follow complete: {result}")
+    finally:
+        db.close()
+
+
 if __name__ == "__main__":
     cli()
