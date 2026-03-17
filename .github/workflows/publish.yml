@@ -46,6 +46,15 @@ jobs:
           pip install playwright anthropic
           playwright install chromium --with-deps
 
+      - name: Restore note.com session
+        if: env.NOTE_SESSION_JSON != ''
+        env:
+          NOTE_SESSION_JSON: ${{ secrets.NOTE_SESSION_JSON }}
+        run: |
+          mkdir -p ~/.smartir
+          echo "$NOTE_SESSION_JSON" > ~/.smartir/note_session.json
+          chmod 600 ~/.smartir/note_session.json
+
       - name: Publish breaking articles (auto-detect new docs)
         env:
           DATABASE_URL: ${{ secrets.SUPABASE_DB_URL }}
@@ -82,6 +91,15 @@ jobs:
           pip install -r requirements.txt
           pip install playwright anthropic
           playwright install chromium --with-deps
+
+      - name: Restore note.com session
+        if: env.NOTE_SESSION_JSON != ''
+        env:
+          NOTE_SESSION_JSON: ${{ secrets.NOTE_SESSION_JSON }}
+        run: |
+          mkdir -p ~/.smartir
+          echo "$NOTE_SESSION_JSON" > ~/.smartir/note_session.json
+          chmod 600 ~/.smartir/note_session.json
 
       - name: Publish daily summary to note.com
         env:
@@ -129,6 +147,15 @@ jobs:
           pip install -r requirements.txt
           pip install playwright anthropic
           playwright install chromium --with-deps
+
+      - name: Restore note.com session
+        if: env.NOTE_SESSION_JSON != ''
+        env:
+          NOTE_SESSION_JSON: ${{ secrets.NOTE_SESSION_JSON }}
+        run: |
+          mkdir -p ~/.smartir
+          echo "$NOTE_SESSION_JSON" > ~/.smartir/note_session.json
+          chmod 600 ~/.smartir/note_session.json
 
       - name: Publish weekly trend report to note.com
         env:
