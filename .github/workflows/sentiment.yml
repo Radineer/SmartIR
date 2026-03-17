@@ -1,0 +1,23 @@
+name: Sentiment Analysis
+
+on:
+  schedule:
+    # 9:00 JST = 0:00 UTC, 15:00 JST = 6:00 UTC
+    - cron: "0 0 * * 1-5"
+    - cron: "0 6 * * 1-5"
+  workflow_dispatch:
+
+jobs:
+  sentiment:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: pip
+      - run: pip install -r requirements.txt
+      - run: python scripts/run_sentiment.py
+        env:
+          DATABASE_URL: ${{ secrets.SUPABASE_DB_URL }}
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}

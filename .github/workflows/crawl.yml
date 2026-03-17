@@ -1,0 +1,63 @@
+name: Crawl TDnet + EDINET
+
+on:
+  schedule:
+    # TDnet: Every 15 min during JST 8:00-18:00 weekdays (UTC 23:00-09:00)
+    - cron: "*/15 23,0,1,2,3,4,5,6,7,8,9 * * 1-5"
+  workflow_dispatch:
+    inputs:
+      target:
+        description: "Crawl target (tdnet/edinet/companies/all)"
+        required: false
+        default: "all"
+
+jobs:
+  crawl-tdnet:
+    if: >-
+      github.event_name == 'workflow_dispatch' &&
+      (github.event.inputs.target == 'tdnet' || github.event.inputs.target == 'all')
+      || github.event_name == 'schedule'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: pip
+      - run: pip install -r requirements.txt
+      - run: python scripts/run_crawl_tdnet.py 1
+        env:
+          DATABASE_URL: ${{ secrets.SUPABASE_DB_URL }}
+
+  crawl-edinet:
+    if: >-
+      github.event_name == 'workflow_dispatch' &&
+      (github.event.inputs.target == 'edinet' || github.event.inputs.target == 'all')
+      || github.event_name == 'schedule'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: pip
+      - run: pip install -r requirements.txt
+      - run: python scripts/run_crawl_edinet.py 1
+        env:
+          DATABASE_URL: ${{ secrets.SUPABASE_DB_URL }}
+
+  crawl-companies:
+    if: >-
+      github.event_name == 'workflow_dispatch' &&
+      (github.event.inputs.target == 'companies' || github.event.inputs.target == 'all')
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: pip
+      - run: pip install -r requirements.txt
+      - run: python scripts/run_crawl_companies.py
+        env:
+          DATABASE_URL: ${{ secrets.SUPABASE_DB_URL }}
