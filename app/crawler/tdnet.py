@@ -56,6 +56,7 @@ class TDNetCrawler(BaseCrawler):
                     logger.warning(f"TDnet: No data for {date_str}")
                 break
 
+            response.encoding = response.apparent_encoding or "utf-8"
             soup = self._parse_html(response.text)
             rows = soup.select("tr")
 
