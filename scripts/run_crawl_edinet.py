@@ -10,7 +10,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 from app.core.database import SessionLocal
 from app.crawler.edinet import EDINETCrawler
 from app.models.company import Company
-from app.models.document import Document
+from app.models.document import Document, DocumentType
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s [%(levelname)s] %(message)s")
 logger = logging.getLogger(__name__)
@@ -43,10 +43,16 @@ def save_crawl_results(results: list, db) -> int:
         if existing:
             continue
 
+        doc_type_str = result.get("doc_type", "other")
+        try:
+            doc_type = DocumentType(doc_type_str)
+        except ValueError:
+            doc_type = DocumentType.OTHER
+
         document = Document(
             company_id=company.id,
             title=result.get("title", ""),
-            doc_type=result.get("doc_type", "other"),
+            doc_type=doc_type,
             publish_date=result.get("publish_date", ""),
             source_url=result.get("source_url", ""),
         )
