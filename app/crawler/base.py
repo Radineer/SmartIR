@@ -34,10 +34,10 @@ class BaseCrawler(ABC):
         """
         pass
     
-    def _get(self, url: str) -> requests.Response:
+    def _get(self, url: str, params: dict = None) -> requests.Response:
         """GETリクエストを送信"""
         try:
-            response = self.session.get(url, headers=self.headers)
+            response = self.session.get(url, headers=self.headers, params=params)
             response.raise_for_status()
             return response
         except requests.exceptions.RequestException as e:
