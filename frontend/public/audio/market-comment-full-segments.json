@@ -1,0 +1,198 @@
+{
+  "speaker": "コハク",
+  "speaker_id": 1878365376,
+  "total_duration": 392.123,
+  "segment_count": 19,
+  "segments": [
+    {
+      "index": 0,
+      "id": "opening",
+      "title": "オープニング",
+      "text": "こんにちは、イリスです。本日も市場の動きを分かりやすくお届けしますね。3月19日、年度末が近づく中での相場動向を、日本市場から海外まで、まるっと解説していきます。それでは早速見ていきましょう。",
+      "start": 0.0,
+      "end": 17.92,
+      "duration": 17.92,
+      "filename": "segment_000_opening.wav"
+    },
+    {
+      "index": 1,
+      "id": "market_summary_nikkei",
+      "title": "日経平均",
+      "text": "まずは日経平均株価からです。本日の終値は37,980円、前日比プラス210円、0.56%の上昇で取引を終えました。朝方は米国FOMCの結果を受けて買いが先行し、一時38,100円台を付ける場面もありましたが、後場は年度末特有のリバランス売りに押されて上げ幅を縮小しています。",
+      "start": 18.42,
+      "end": 45.587,
+      "duration": 27.167,
+      "filename": "segment_001_market_summary_nikkei.wav"
+    },
+    {
+      "index": 2,
+      "id": "market_summary_topix",
+      "title": "TOPIX",
+      "text": "TOPIXは2,670ポイント、前日比プラス15ポイント、0.57%の上昇です。東証プライム市場では値上がり銘柄が1,050を超え、全体の57%が上昇しました。大型株よりも中小型株の方が元気が良い1日でしたね。",
+      "start": 46.087,
+      "end": 66.781,
+      "duration": 20.694,
+      "filename": "segment_002_market_summary_topix.wav"
+    },
+    {
+      "index": 3,
+      "id": "market_summary_weekly_comparison",
+      "title": "週間比較",
+      "text": "週間で見ると、日経平均は先週末から1.2%の上昇。3月上旬の急落からの回復基調が続いています。年初来では約マイナス2.5%とまだ水面下ですが、底打ちの兆しが出てきているという見方が広がっていますね。",
+      "start": 67.281,
+      "end": 86.71,
+      "duration": 19.429,
+      "filename": "segment_003_market_summary_weekly_comparison.wav"
+    },
+    {
+      "index": 4,
+      "id": "sector_analysis_top_sectors",
+      "title": "上昇セクターTOP3",
+      "text": "セクター別の動きを見ていきましょう。上昇率トップはAI関連銘柄を含む情報・通信セクターで、プラス2.1%です。エヌビディアの新GPU発表の影響で、半導体設計や通信インフラに関わる銘柄が全面高でした。2位は海運セクターでプラス1.8%。紅海の緊張継続で海上運賃が上昇し、日本郵船や商船三井が買われています。3位は自動車セクターでプラス1.3%。春闘での大幅賃上げ合意が好感されました。",
+      "start": 87.21,
+      "end": 122.806,
+      "duration": 35.596,
+      "filename": "segment_004_sector_analysis_top_sectors.wav"
+    },
+    {
+      "index": 5,
+      "id": "sector_analysis_bottom_sectors",
+      "title": "下落セクターTOP3",
+      "text": "一方、下落セクターはこちらです。ワースト1位は電力・ガスでマイナス1.5%。再エネ関連の規制強化懸念が重荷となりました。2位は建設業でマイナス0.9%。人件費上昇が利益率を圧迫するとの見方が出ています。3位は小売セクターでマイナス0.6%。個人消費の鈍化懸念が意識されました。",
+      "start": 123.306,
+      "end": 149.845,
+      "duration": 26.539,
+      "filename": "segment_005_sector_analysis_bottom_sectors.wav"
+    },
+    {
+      "index": 6,
+      "id": "sector_analysis_sector_background",
+      "title": "背景解説",
+      "text": "今日のセクター動向をまとめると、「テクノロジーと物流が主役、内需は慎重」という構図ですね。グローバルなAIブームの恩恵を受ける銘柄と、国内の物価上昇に苦しむ銘柄で、二極化が鮮明になっています。",
+      "start": 150.345,
+      "end": 167.062,
+      "duration": 16.717,
+      "filename": "segment_006_sector_analysis_sector_background.wav"
+    },
+    {
+      "index": 7,
+      "id": "individual_stocks_stock_1",
+      "title": "注目銘柄1: ソフトバンクグループ(9984)",
+      "text": "注目銘柄の1つ目はソフトバンクグループです。終値は9,250円、前日比プラス3.2%と大幅続伸でした。ARM社の好業績見通しに加え、AIインフラ投資の拡大方針が評価されています。ビジョンファンドの含み益も順調に拡大中ですね。",
+      "start": 167.562,
+      "end": 188.695,
+      "duration": 21.133,
+      "filename": "segment_007_individual_stocks_stock_1.wav"
+    },
+    {
+      "index": 8,
+      "id": "individual_stocks_stock_2",
+      "title": "注目銘柄2: 三菱UFJ(8306)",
+      "text": "2つ目は三菱UFJフィナンシャル・グループ。終値は1,780円、前日比プラス0.8%です。日銀の追加利上げ観測が再び強まる中、メガバンクへの資金流入が続いています。今期の最終利益は過去最高を更新する見込みで、増配期待も高いですね。",
+      "start": 189.195,
+      "end": 211.545,
+      "duration": 22.351,
+      "filename": "segment_008_individual_stocks_stock_2.wav"
+    },
+    {
+      "index": 9,
+      "id": "individual_stocks_ai_comment",
+      "title": "AI分析コメント",
+      "text": "私のIR分析によると、両銘柄とも直近のIR資料ではポジティブなトーンが強まっています。特にソフトバンクグループは経営陣の発言にAIへの強い確信が感じられます。ただし、バリュエーション面では割高感も出始めているので、新規参入のタイミングには注意が必要です。",
+      "start": 212.045,
+      "end": 233.931,
+      "duration": 21.886,
+      "filename": "segment_009_individual_stocks_ai_comment.wav"
+    },
+    {
+      "index": 10,
+      "id": "overseas_forex_us_market",
+      "title": "米国市場動向",
+      "text": "続いて海外市場です。昨夜のFOMCでは政策金利が据え置かれ、年内2回の利下げ見通しが維持されました。これを好感してNY市場はダウが180ドル高、ナスダックは1.2%上昇。S&P500も続伸し、年初来高値を更新しています。",
+      "start": 234.431,
+      "end": 255.824,
+      "duration": 21.392,
+      "filename": "segment_010_overseas_forex_us_market.wav"
+    },
+    {
+      "index": 11,
+      "id": "overseas_forex_forex",
+      "title": "ドル円相場",
+      "text": "ドル円は現在149円80銭付近で推移しています。FOMCの結果を受けてドル売りが進み、150円の大台を割り込みました。明日の日銀会合の結果次第では、さらに円高が進む可能性もあります。",
+      "start": 256.324,
+      "end": 272.928,
+      "duration": 16.604,
+      "filename": "segment_011_overseas_forex_forex.wav"
+    },
+    {
+      "index": 12,
+      "id": "overseas_forex_outlook",
+      "title": "今後の見通し",
+      "text": "明日は日銀の金融政策決定会合の結果発表があります。追加利上げは見送られる見通しですが、植田総裁の会見でのタカ派発言には警戒が必要です。為替と金利の動向に注目ですね。",
+      "start": 273.428,
+      "end": 288.651,
+      "duration": 15.223,
+      "filename": "segment_012_overseas_forex_outlook.wav"
+    },
+    {
+      "index": 13,
+      "id": "ai_analysis_sentiment",
+      "title": "センチメント分析結果",
+      "text": "私が分析した本日の市場センチメントをお伝えします。IR資料と企業ニュースの解析結果は、ポジティブが52%、ニュートラルが35%、ネガティブが13%です。先週からポジティブの割合がやや低下しており、慎重なムードが漂い始めています。",
+      "start": 289.151,
+      "end": 310.288,
+      "duration": 21.137,
+      "filename": "segment_013_ai_analysis_sentiment.wav"
+    },
+    {
+      "index": 14,
+      "id": "ai_analysis_risk_factors",
+      "title": "市場のリスク要因",
+      "text": "注意すべきリスク要因は3つあります。第一に、年度末の需給悪化。機関投資家のリバランスと配当落ちの影響です。第二に、中国経済の回復遅れ。第三に、米国のAIバブル懸念です。テクノロジーセクターへの資金集中は裏返すと脆弱性でもあります。",
+      "start": 310.788,
+      "end": 332.014,
+      "duration": 21.226,
+      "filename": "segment_014_ai_analysis_risk_factors.wav"
+    },
+    {
+      "index": 15,
+      "id": "ai_analysis_iris_view",
+      "title": "イリスの見解",
+      "text": "私の見解としては、4月の新年度入りに向けて徐々にセンチメントが改善すると見ています。特に日本企業の業績は円安効果で上振れ余地があり、海外投資家の日本株回帰も期待できますね。ただし、3月末までは波乱含みです。",
+      "start": 332.514,
+      "end": 351.955,
+      "duration": 19.441,
+      "filename": "segment_015_ai_analysis_iris_view.wav"
+    },
+    {
+      "index": 16,
+      "id": "ending_summary",
+      "title": "まとめ",
+      "text": "本日のまとめです。日経平均は小幅続伸、AI・半導体が市場を牽引。FOMCは想定通りで安心感。明日の日銀会合と年度末の需給に引き続き注目です。",
+      "start": 352.455,
+      "end": 367.238,
+      "duration": 14.783,
+      "filename": "segment_016_ending_summary.wav"
+    },
+    {
+      "index": 17,
+      "id": "ending_next_preview",
+      "title": "次回予告",
+      "text": "次回は年度末特別編として、2025年度の日本株市場を総括し、2026年度の注目テーマをお届けします。お楽しみに。",
+      "start": 367.738,
+      "end": 379.025,
+      "duration": 11.287,
+      "filename": "segment_017_ending_next_preview.wav"
+    },
+    {
+      "index": 18,
+      "id": "ending_subscribe",
+      "title": "チャンネル登録促進",
+      "text": "この動画が参考になったら、ぜひチャンネル登録と高評価をお願いします。コメントでの質問もお待ちしています。それでは、また次の動画でお会いしましょう。イリスでした。",
+      "start": 379.525,
+      "end": 392.123,
+      "duration": 12.599,
+      "filename": "segment_018_ending_subscribe.wav"
+    }
+  ]
+}

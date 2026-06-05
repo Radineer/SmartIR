@@ -1,0 +1,28 @@
+{
+  "tracks": [
+    {
+      "filename": "calm_corporate.mp3",
+      "mood": "calm",
+      "bpm": 80,
+      "duration": 180
+    },
+    {
+      "filename": "upbeat_market.mp3",
+      "mood": "energetic",
+      "bpm": 120,
+      "duration": 150
+    },
+    {
+      "filename": "serious_analysis.mp3",
+      "mood": "serious",
+      "bpm": 90,
+      "duration": 200
+    },
+    {
+      "filename": "happy_closing.mp3",
+      "mood": "happy",
+      "bpm": 110,
+      "duration": 120
+    }
+  ]
+}

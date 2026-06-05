@@ -1,0 +1,125 @@
+name: Auto Stream (Iris VTuber)
+
+on:
+  schedule:
+    # 平日朝 23:45 UTC = 8:45 JST
+    - cron: "45 23 * * 0-3"  # Sun-Wed night (= Mon-Thu morning JST)
+    # 日曜 01:00 UTC = 10:00 JST (週間まとめ)
+    - cron: "0 1 * * 0"
+
+  workflow_dispatch:
+    inputs:
+      stream_type:
+        description: "Stream type"
+        required: true
+        default: "morning_market"
+        type: choice
+        options:
+          - morning_market
+          - ir_analysis
+          - weekly_summary
+          - trading_challenge
+      company_code:
+        description: "Company ticker code (for ir_analysis)"
+        required: false
+        type: string
+      dry_run:
+        description: "Dry run (no actual streaming)"
+        required: false
+        default: false
+        type: boolean
+      youtube:
+        description: "Enable YouTube Live + OBS integration"
+        required: false
+        default: false
+        type: boolean
+
+jobs:
+  auto-stream:
+    runs-on: self-hosted  # macOS ローカルランナー
+    timeout-minutes: 60
+
+    env:
+      DATABASE_URL: ${{ secrets.DATABASE_URL }}
+      ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+      OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+      YOUTUBE_CLIENT_ID: ${{ secrets.YOUTUBE_CLIENT_ID }}
+      YOUTUBE_CLIENT_SECRET: ${{ secrets.YOUTUBE_CLIENT_SECRET }}
+      OBS_WS_PASSWORD: ${{ secrets.OBS_WS_PASSWORD }}
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: recursive
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Determine stream type
+        id: config
+        run: |
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            echo "stream_type=${{ inputs.stream_type }}" >> $GITHUB_OUTPUT
+            echo "company_code=${{ inputs.company_code }}" >> $GITHUB_OUTPUT
+            echo "dry_run=${{ inputs.dry_run }}" >> $GITHUB_OUTPUT
+            echo "youtube=${{ inputs.youtube }}" >> $GITHUB_OUTPUT
+          else
+            # スケジュール: 曜日で判定
+            DAY_OF_WEEK=$(date -u +%u)
+            if [ "$DAY_OF_WEEK" = "7" ]; then
+              echo "stream_type=weekly_summary" >> $GITHUB_OUTPUT
+            else
+              echo "stream_type=morning_market" >> $GITHUB_OUTPUT
+            fi
+            echo "company_code=" >> $GITHUB_OUTPUT
+            echo "dry_run=false" >> $GITHUB_OUTPUT
+            echo "youtube=true" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Restore YouTube tokens
+        if: steps.config.outputs.youtube == 'true'
+        run: |
+          echo '${{ secrets.YOUTUBE_TOKENS_JSON }}' > youtube_tokens.json
+          if [ ! -s youtube_tokens.json ]; then
+            echo "WARNING: YOUTUBE_TOKENS_JSON secret is empty, YouTube integration will be skipped"
+            rm -f youtube_tokens.json
+          fi
+
+      - name: Start AivisSpeech
+        run: docker compose up -d aivisspeech
+
+      - name: Setup and start aituber-kit
+        run: |
+          ./scripts/run_live_stream.sh --setup
+          cd aituber-kit && npm run dev &
+          # Wait for aituber-kit
+          for i in $(seq 1 30); do
+            curl -s http://localhost:3000 > /dev/null 2>&1 && break
+            sleep 1
+          done
+
+      - name: Run auto stream
+        run: |
+          ARGS="--type ${{ steps.config.outputs.stream_type }}"
+          if [ -n "${{ steps.config.outputs.company_code }}" ]; then
+            ARGS="$ARGS --company-code ${{ steps.config.outputs.company_code }}"
+          fi
+          if [ "${{ steps.config.outputs.dry_run }}" = "true" ]; then
+            ARGS="$ARGS --dry-run"
+          fi
+          if [ "${{ steps.config.outputs.youtube }}" = "true" ]; then
+            ARGS="$ARGS --youtube"
+          fi
+          python scripts/run_auto_stream.py $ARGS
+
+      - name: Cleanup
+        if: always()
+        run: |
+          # Stop aituber-kit
+          pkill -f "next dev" || true
+          docker compose down

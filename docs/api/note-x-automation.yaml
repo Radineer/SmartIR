@@ -1,0 +1,208 @@
+openapi: 3.0.0
+info:
+  title: SmartIR Publish & Social API
+  version: 1.0.0
+  description: note.com記事投稿・X自動運用API
+
+paths:
+  /api/publish/note/article/{document_id}:
+    post:
+      summary: note.com に分析記事を投稿
+      tags: [publish]
+      parameters:
+        - name: document_id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                free:
+                  type: boolean
+                  default: false
+                  description: 無料記事として投稿
+                dry_run:
+                  type: boolean
+                  default: false
+                  description: プレビューのみ
+      responses:
+        "200":
+          description: 投稿成功
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  note_url:
+                    type: string
+                  title:
+                    type: string
+                  price:
+                    type: integer
+        "404":
+          description: ドキュメントまたは分析結果が見つからない
+        "409":
+          description: 既に投稿済み
+
+  /api/publish/note/daily:
+    post:
+      summary: 日次まとめ記事を投稿
+      tags: [publish]
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                date:
+                  type: string
+                  format: date
+                  description: 対象日付 (省略時は当日)
+                dry_run:
+                  type: boolean
+                  default: false
+      responses:
+        "200":
+          description: 投稿成功
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  note_url:
+                    type: string
+                  article_count:
+                    type: integer
+
+  /api/publish/tweet/breaking/{document_id}:
+    post:
+      summary: 決算速報ツイート
+      tags: [social]
+      parameters:
+        - name: document_id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                dry_run:
+                  type: boolean
+                  default: false
+      responses:
+        "200":
+          description: 投稿成功
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  tweet_id:
+                    type: string
+                  text:
+                    type: string
+        "409":
+          description: 既にツイート済み
+
+  /api/publish/tweet/daily:
+    post:
+      summary: 日次まとめツイート
+      tags: [social]
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                date:
+                  type: string
+                  format: date
+                dry_run:
+                  type: boolean
+                  default: false
+      responses:
+        "200":
+          description: 投稿成功
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  tweet_id:
+                    type: string
+                  text:
+                    type: string
+
+  /api/publish/tweet/weekly:
+    post:
+      summary: 週次まとめツイート
+      tags: [social]
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                dry_run:
+                  type: boolean
+                  default: false
+      responses:
+        "200":
+          description: 投稿成功
+
+  /api/publish/logs:
+    get:
+      summary: 投稿ログ取得
+      tags: [publish]
+      parameters:
+        - name: platform
+          in: query
+          schema:
+            type: string
+            enum: [note, twitter]
+        - name: post_type
+          in: query
+          schema:
+            type: string
+            enum: [breaking, analysis, daily, weekly]
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            default: 50
+            maximum: 100
+      responses:
+        "200":
+          description: 投稿ログ一覧
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    id:
+                      type: integer
+                    platform:
+                      type: string
+                    post_type:
+                      type: string
+                    external_id:
+                      type: string
+                    document_id:
+                      type: integer
+                    company_id:
+                      type: integer
+                    content_preview:
+                      type: string
+                    posted_at:
+                      type: string
+                      format: date-time

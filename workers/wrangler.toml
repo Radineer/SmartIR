@@ -1,0 +1,22 @@
+name = "smartir-api"
+main = "src/index.ts"
+compatibility_date = "2024-12-01"
+
+[triggers]
+crons = [
+  "*/10 23,0,1,2,3,4,5,6,7,8,9 * * 1-5",
+  "0 0,1,2,3,4,5,6,7,8 * * 1-5",
+  "*/5 * * * *",
+  "0 * * * *",
+]
+
+[[kv_namespaces]]
+binding = "MARKET_CACHE"
+id = "1e070ce6623f4d09860a56ef2ee39474"
+
+[[r2_buckets]]
+binding = "DOCUMENTS"
+bucket_name = "smartir-documents"
+
+[vars]
+ENVIRONMENT = "production"

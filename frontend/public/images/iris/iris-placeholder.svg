@@ -1,0 +1,64 @@
+<svg width="400" height="600" viewBox="0 0 400 600" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Background gradient -->
+  <defs>
+    <linearGradient id="bgGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#EEF2FF;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#E0F2FE;stop-opacity:1" />
+    </linearGradient>
+    <linearGradient id="hairGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#E5E7EB;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#F3F4F6;stop-opacity:1" />
+    </linearGradient>
+    <linearGradient id="eyeGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#6366F1;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#22D3EE;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+
+  <!-- Body silhouette -->
+  <ellipse cx="200" cy="500" rx="120" ry="180" fill="white" opacity="0.8"/>
+
+  <!-- Head -->
+  <circle cx="200" cy="200" r="100" fill="url(#hairGradient)"/>
+
+  <!-- Face -->
+  <ellipse cx="200" cy="220" rx="70" ry="80" fill="#FEF3C7"/>
+
+  <!-- Hair bangs -->
+  <path d="M130 180 Q150 120 200 130 Q250 120 270 180 Q240 160 200 170 Q160 160 130 180" fill="url(#hairGradient)"/>
+
+  <!-- Eyes -->
+  <ellipse cx="170" cy="210" rx="15" ry="18" fill="url(#eyeGradient)"/>
+  <ellipse cx="230" cy="210" rx="15" ry="18" fill="url(#eyeGradient)"/>
+
+  <!-- Eye highlights -->
+  <circle cx="165" cy="205" r="5" fill="white" opacity="0.8"/>
+  <circle cx="225" cy="205" r="5" fill="white" opacity="0.8"/>
+
+  <!-- Circuit pattern in right eye -->
+  <circle cx="230" cy="210" r="8" fill="none" stroke="#22D3EE" stroke-width="1" opacity="0.6"/>
+  <path d="M225 210 L235 210 M230 205 L230 215" stroke="#22D3EE" stroke-width="0.5" opacity="0.6"/>
+
+  <!-- Smile -->
+  <path d="M180 250 Q200 270 220 250" stroke="#9CA3AF" stroke-width="3" fill="none" stroke-linecap="round"/>
+
+  <!-- Lab coat collar -->
+  <path d="M130 320 L170 280 L200 300 L230 280 L270 320" fill="white" stroke="#E5E7EB" stroke-width="2"/>
+
+  <!-- Holographic element -->
+  <rect x="280" y="200" width="60" height="40" rx="5" fill="url(#eyeGradient)" opacity="0.3"/>
+  <line x1="290" y1="210" x2="330" y2="210" stroke="white" stroke-width="2" opacity="0.5"/>
+  <line x1="290" y1="220" x2="320" y2="220" stroke="white" stroke-width="2" opacity="0.5"/>
+  <line x1="290" y1="230" x2="310" y2="230" stroke="white" stroke-width="2" opacity="0.5"/>
+
+  <!-- Text placeholder -->
+  <text x="200" y="450" text-anchor="middle" fill="#6366F1" font-family="system-ui" font-size="14" font-weight="bold">
+    IRIS
+  </text>
+  <text x="200" y="470" text-anchor="middle" fill="#9CA3AF" font-family="system-ui" font-size="10">
+    AI IR Analyst
+  </text>
+  <text x="200" y="520" text-anchor="middle" fill="#9CA3AF" font-family="system-ui" font-size="10">
+    画像準備中...
+  </text>
+</svg>

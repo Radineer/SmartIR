@@ -1,0 +1,48 @@
+version: '3.8'
+
+services:
+  # Local development only - production uses Supabase + CF Workers
+  api:
+    build: .
+    ports:
+      - "8000:8000"
+    environment:
+      - DATABASE_URL=postgresql://postgres:postgres@db:5432/smartir
+      - OPENAI_API_KEY=${OPENAI_API_KEY}
+      - AUTO_START_SCHEDULER=false
+    depends_on:
+      - db
+    volumes:
+      - ./app:/app/app:ro
+
+  db:
+    image: postgres:15-alpine
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_DB=smartir
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+
+  # AivisSpeech Engine - high-quality Japanese TTS (VOICEVOX compatible API)
+  aivisspeech:
+    image: ghcr.io/aivis-project/aivisspeech-engine:latest
+    ports:
+      - "10101:10101"
+    volumes:
+      - aivisspeech_data:/home/user/.local/share
+    environment:
+      - AIVISSPEECH_HOST=0.0.0.0
+      - AIVISSPEECH_PORT=10101
+    entrypoint: >
+      /bin/bash -c "
+        chown -R user:user /home/user/.local/share &&
+        exec gosu user /opt/python/bin/poetry run python ./run.py --host 0.0.0.0 --port 10101
+      "
+    restart: unless-stopped
+
+volumes:
+  postgres_data:
+  aivisspeech_data:

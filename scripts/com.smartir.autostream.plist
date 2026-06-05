@@ -1,0 +1,118 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+    <key>Label</key>
+    <string>com.smartir.autostream</string>
+
+    <key>ProgramArguments</key>
+    <array>
+        <string>/usr/bin/env</string>
+        <string>bash</string>
+        <string>-c</string>
+        <string>
+cd /Users/yu01/Desktop/SmartIR &amp;&amp; \
+if [ -f .env ]; then source .env; else echo "WARNING: .env not found" &gt;&amp;2; fi &amp;&amp; \
+DOW=$(date +%u) &amp;&amp; \
+if [ "$DOW" = "7" ]; then
+  STREAM_TYPE=weekly_summary
+else
+  STREAM_TYPE=morning_market
+fi &amp;&amp; \
+python3 scripts/run_auto_stream.py --type "$STREAM_TYPE" --youtube
+        </string>
+    </array>
+
+    <key>StartCalendarInterval</key>
+    <array>
+        <!-- 月曜 8:45 JST -->
+        <dict>
+            <key>Weekday</key>
+            <integer>1</integer>
+            <key>Hour</key>
+            <integer>8</integer>
+            <key>Minute</key>
+            <integer>45</integer>
+        </dict>
+        <!-- 火曜 8:45 JST -->
+        <dict>
+            <key>Weekday</key>
+            <integer>2</integer>
+            <key>Hour</key>
+            <integer>8</integer>
+            <key>Minute</key>
+            <integer>45</integer>
+        </dict>
+        <!-- 水曜 8:45 JST -->
+        <dict>
+            <key>Weekday</key>
+            <integer>3</integer>
+            <key>Hour</key>
+            <integer>8</integer>
+            <key>Minute</key>
+            <integer>45</integer>
+        </dict>
+        <!-- 木曜 8:45 JST -->
+        <dict>
+            <key>Weekday</key>
+            <integer>4</integer>
+            <key>Hour</key>
+            <integer>8</integer>
+            <key>Minute</key>
+            <integer>45</integer>
+        </dict>
+        <!-- 金曜 8:45 JST -->
+        <dict>
+            <key>Weekday</key>
+            <integer>5</integer>
+            <key>Hour</key>
+            <integer>8</integer>
+            <key>Minute</key>
+            <integer>45</integer>
+        </dict>
+        <!-- 日曜 10:00 JST (週間まとめ) -->
+        <dict>
+            <key>Weekday</key>
+            <integer>0</integer>
+            <key>Hour</key>
+            <integer>10</integer>
+            <key>Minute</key>
+            <integer>0</integer>
+        </dict>
+    </array>
+
+    <key>StandardOutPath</key>
+    <string>/tmp/smartir-autostream.log</string>
+
+    <key>StandardErrorPath</key>
+    <string>/tmp/smartir-autostream-error.log</string>
+
+    <key>WorkingDirectory</key>
+    <string>/Users/yu01/Desktop/SmartIR</string>
+
+    <!-- 失敗時のリトライを無効化 -->
+    <key>KeepAlive</key>
+    <false/>
+</dict>
+</plist>
+<!--
+インストール方法:
+  cp scripts/com.smartir.autostream.plist ~/Library/LaunchAgents/
+  launchctl load ~/Library/LaunchAgents/com.smartir.autostream.plist
+
+アンインストール:
+  launchctl unload ~/Library/LaunchAgents/com.smartir.autostream.plist
+  rm ~/Library/LaunchAgents/com.smartir.autostream.plist
+
+手動テスト:
+  launchctl start com.smartir.autostream
+
+ログ確認:
+  tail -f /tmp/smartir-autostream.log
+  tail -f /tmp/smartir-autostream-error.log
+
+曜日自動判定:
+  平日 → morning_market
+  日曜 → weekly_summary
+  すべて --youtube 付きで YouTube Live + OBS 統合有効
+-->

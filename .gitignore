@@ -1,0 +1,107 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+
+# Virtual environments
+venv/
+ENV/
+env/
+.venv/
+
+# Environment variables
+.env
+.env.local
+.env.*.local
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+
+# Database
+*.db
+*.sqlite3
+
+# Logs
+*.log
+logs/
+
+# Coverage
+htmlcov/
+.coverage
+.coverage.*
+coverage.xml
+*.cover
+
+# Pytest
+.pytest_cache/
+.cache/
+
+# Mypy
+.mypy_cache/
+
+# Celery
+celerybeat-schedule
+celerybeat.pid
+
+# Node (frontend)
+frontend/node_modules/
+frontend/.next/
+frontend/out/
+frontend/.vercel/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Temporary files
+*.tmp
+*.temp
+*.orig
+
+# Credentials / tokens
+youtube_tokens.json
+client_secrets.json
+.env.*
+!.env.example
+!.env.template
+!.env.sample
+settings.local.json
+.claude/settings.local.json
+*.key
+*.pem
+*credentials*
+*service_role*
+*.p8
+*.p12
+id_rsa*
+node_modules/
+.next/
+.turbo/
+*.pyc
+*.sqlite
+.wrangler/
+coverage/
+*.bak
+*.bak.*
+*.bak-*

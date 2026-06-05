@@ -1,0 +1,252 @@
+{
+  "meta": {
+    "title": "イリスの市況解説",
+    "date": "2026-03-19",
+    "total_duration_seconds": 360,
+    "character": {
+      "name": "イリス",
+      "personality": "知的でクールだが親しみやすい",
+      "first_person": "私",
+      "speech_style": "です/ますベース"
+    },
+    "version": "2.0.0"
+  },
+  "segments": [
+    {
+      "id": "opening",
+      "title": "オープニング",
+      "time_range": "0:00-0:15",
+      "duration_seconds": 15,
+      "expression": "happy",
+      "chart_type": null,
+      "background": "studio_default",
+      "text": "こんにちは、イリスです。本日も市場の動きを分かりやすくお届けしますね。3月19日、年度末が近づく中での相場動向を、日本市場から海外まで、まるっと解説していきます。それでは早速見ていきましょう。"
+    },
+    {
+      "id": "market_summary",
+      "title": "本日の市場サマリー",
+      "time_range": "0:15-1:30",
+      "duration_seconds": 75,
+      "expression": "neutral",
+      "chart_type": "nikkei_topix_line",
+      "background": "chart_overlay",
+      "subsections": [
+        {
+          "id": "nikkei",
+          "label": "日経平均",
+          "duration_seconds": 25,
+          "expression": "neutral",
+          "text": "まずは日経平均株価からです。本日の終値は37,980円、前日比プラス210円、0.56%の上昇で取引を終えました。朝方は米国FOMCの結果を受けて買いが先行し、一時38,100円台を付ける場面もありましたが、後場は年度末特有のリバランス売りに押されて上げ幅を縮小しています。"
+        },
+        {
+          "id": "topix",
+          "label": "TOPIX",
+          "duration_seconds": 25,
+          "expression": "neutral",
+          "text": "TOPIXは2,670ポイント、前日比プラス15ポイント、0.57%の上昇です。東証プライム市場では値上がり銘柄が1,050を超え、全体の57%が上昇しました。大型株よりも中小型株の方が元気が良い1日でしたね。"
+        },
+        {
+          "id": "weekly_comparison",
+          "label": "週間比較",
+          "duration_seconds": 25,
+          "expression": "happy",
+          "text": "週間で見ると、日経平均は先週末から1.2%の上昇。3月上旬の急落からの回復基調が続いています。年初来では約マイナス2.5%とまだ水面下ですが、底打ちの兆しが出てきているという見方が広がっていますね。"
+        }
+      ]
+    },
+    {
+      "id": "sector_analysis",
+      "title": "注目セクター分析",
+      "time_range": "1:30-3:00",
+      "duration_seconds": 90,
+      "expression": "neutral",
+      "chart_type": "sector_heatmap",
+      "background": "chart_overlay",
+      "subsections": [
+        {
+          "id": "top_sectors",
+          "label": "上昇セクターTOP3",
+          "duration_seconds": 40,
+          "expression": "happy",
+          "text": "セクター別の動きを見ていきましょう。上昇率トップはAI関連銘柄を含む情報・通信セクターで、プラス2.1%です。エヌビディアの新GPU発表の影響で、半導体設計や通信インフラに関わる銘柄が全面高でした。2位は海運セクターでプラス1.8%。紅海の緊張継続で海上運賃が上昇し、日本郵船や商船三井が買われています。3位は自動車セクターでプラス1.3%。春闘での大幅賃上げ合意が好感されました。"
+        },
+        {
+          "id": "bottom_sectors",
+          "label": "下落セクターTOP3",
+          "duration_seconds": 30,
+          "expression": "concerned",
+          "text": "一方、下落セクターはこちらです。ワースト1位は電力・ガスでマイナス1.5%。再エネ関連の規制強化懸念が重荷となりました。2位は建設業でマイナス0.9%。人件費上昇が利益率を圧迫するとの見方が出ています。3位は小売セクターでマイナス0.6%。個人消費の鈍化懸念が意識されました。"
+        },
+        {
+          "id": "sector_background",
+          "label": "背景解説",
+          "duration_seconds": 20,
+          "expression": "neutral",
+          "text": "今日のセクター動向をまとめると、「テクノロジーと物流が主役、内需は慎重」という構図ですね。グローバルなAIブームの恩恵を受ける銘柄と、国内の物価上昇に苦しむ銘柄で、二極化が鮮明になっています。"
+        }
+      ]
+    },
+    {
+      "id": "individual_stocks",
+      "title": "個別銘柄ピックアップ",
+      "time_range": "3:00-4:20",
+      "duration_seconds": 80,
+      "expression": "neutral",
+      "chart_type": "stock_chart",
+      "background": "chart_overlay",
+      "subsections": [
+        {
+          "id": "stock_1",
+          "label": "注目銘柄1: ソフトバンクグループ(9984)",
+          "duration_seconds": 30,
+          "expression": "happy",
+          "ticker_code": "9984",
+          "company_name": "ソフトバンクグループ",
+          "text": "注目銘柄の1つ目はソフトバンクグループです。終値は9,250円、前日比プラス3.2%と大幅続伸でした。ARM社の好業績見通しに加え、AIインフラ投資の拡大方針が評価されています。ビジョンファンドの含み益も順調に拡大中ですね。"
+        },
+        {
+          "id": "stock_2",
+          "label": "注目銘柄2: 三菱UFJ(8306)",
+          "duration_seconds": 30,
+          "expression": "neutral",
+          "ticker_code": "8306",
+          "company_name": "三菱UFJフィナンシャル・グループ",
+          "text": "2つ目は三菱UFJフィナンシャル・グループ。終値は1,780円、前日比プラス0.8%です。日銀の追加利上げ観測が再び強まる中、メガバンクへの資金流入が続いています。今期の最終利益は過去最高を更新する見込みで、増配期待も高いですね。"
+        },
+        {
+          "id": "ai_comment",
+          "label": "AI分析コメント",
+          "duration_seconds": 20,
+          "expression": "thinking",
+          "text": "私のIR分析によると、両銘柄とも直近のIR資料ではポジティブなトーンが強まっています。特にソフトバンクグループは経営陣の発言にAIへの強い確信が感じられます。ただし、バリュエーション面では割高感も出始めているので、新規参入のタイミングには注意が必要です。"
+        }
+      ]
+    },
+    {
+      "id": "overseas_forex",
+      "title": "海外市場・為替",
+      "time_range": "4:20-5:10",
+      "duration_seconds": 50,
+      "expression": "neutral",
+      "chart_type": "world_markets",
+      "background": "chart_overlay",
+      "subsections": [
+        {
+          "id": "us_market",
+          "label": "米国市場動向",
+          "duration_seconds": 20,
+          "expression": "neutral",
+          "text": "続いて海外市場です。昨夜のFOMCでは政策金利が据え置かれ、年内2回の利下げ見通しが維持されました。これを好感してNY市場はダウが180ドル高、ナスダックは1.2%上昇。S&P500も続伸し、年初来高値を更新しています。"
+        },
+        {
+          "id": "forex",
+          "label": "ドル円相場",
+          "duration_seconds": 15,
+          "expression": "neutral",
+          "text": "ドル円は現在149円80銭付近で推移しています。FOMCの結果を受けてドル売りが進み、150円の大台を割り込みました。明日の日銀会合の結果次第では、さらに円高が進む可能性もあります。"
+        },
+        {
+          "id": "outlook",
+          "label": "今後の見通し",
+          "duration_seconds": 15,
+          "expression": "thinking",
+          "text": "明日は日銀の金融政策決定会合の結果発表があります。追加利上げは見送られる見通しですが、植田総裁の会見でのタカ派発言には警戒が必要です。為替と金利の動向に注目ですね。"
+        }
+      ]
+    },
+    {
+      "id": "ai_analysis",
+      "title": "AI独自分析",
+      "time_range": "5:10-6:00",
+      "duration_seconds": 50,
+      "expression": "thinking",
+      "chart_type": "sentiment_gauge",
+      "background": "data_visualization",
+      "subsections": [
+        {
+          "id": "sentiment",
+          "label": "センチメント分析結果",
+          "duration_seconds": 18,
+          "expression": "neutral",
+          "text": "私が分析した本日の市場センチメントをお伝えします。IR資料と企業ニュースの解析結果は、ポジティブが52%、ニュートラルが35%、ネガティブが13%です。先週からポジティブの割合がやや低下しており、慎重なムードが漂い始めています。"
+        },
+        {
+          "id": "risk_factors",
+          "label": "市場のリスク要因",
+          "duration_seconds": 18,
+          "expression": "concerned",
+          "text": "注意すべきリスク要因は3つあります。第一に、年度末の需給悪化。機関投資家のリバランスと配当落ちの影響です。第二に、中国経済の回復遅れ。第三に、米国のAIバブル懸念です。テクノロジーセクターへの資金集中は裏返すと脆弱性でもあります。"
+        },
+        {
+          "id": "iris_view",
+          "label": "イリスの見解",
+          "duration_seconds": 14,
+          "expression": "confident",
+          "text": "私の見解としては、4月の新年度入りに向けて徐々にセンチメントが改善すると見ています。特に日本企業の業績は円安効果で上振れ余地があり、海外投資家の日本株回帰も期待できますね。ただし、3月末までは波乱含みです。"
+        }
+      ]
+    },
+    {
+      "id": "ending",
+      "title": "エンディング",
+      "time_range": "6:00-6:30",
+      "duration_seconds": 30,
+      "expression": "happy",
+      "chart_type": null,
+      "background": "studio_default",
+      "subsections": [
+        {
+          "id": "summary",
+          "label": "まとめ",
+          "duration_seconds": 12,
+          "expression": "neutral",
+          "text": "本日のまとめです。日経平均は小幅続伸、AI・半導体が市場を牽引。FOMCは想定通りで安心感。明日の日銀会合と年度末の需給に引き続き注目です。"
+        },
+        {
+          "id": "next_preview",
+          "label": "次回予告",
+          "duration_seconds": 8,
+          "expression": "happy",
+          "text": "次回は年度末特別編として、2025年度の日本株市場を総括し、2026年度の注目テーマをお届けします。お楽しみに。"
+        },
+        {
+          "id": "subscribe",
+          "label": "チャンネル登録促進",
+          "duration_seconds": 10,
+          "expression": "happy",
+          "text": "この動画が参考になったら、ぜひチャンネル登録と高評価をお願いします。コメントでの質問もお待ちしています。それでは、また次の動画でお会いしましょう。イリスでした。"
+        }
+      ]
+    }
+  ],
+  "expressions_map": {
+    "happy": "笑顔・明るい表情",
+    "neutral": "落ち着いた表情",
+    "thinking": "考え込む表情・分析中",
+    "concerned": "心配・注意を促す表情",
+    "confident": "自信のある表情",
+    "surprised": "驚きの表情"
+  },
+  "chart_types_map": {
+    "nikkei_topix_line": "日経平均・TOPIXの日中チャート",
+    "sector_heatmap": "セクター別騰落率ヒートマップ",
+    "stock_chart": "個別銘柄のローソク足チャート",
+    "world_markets": "世界市場一覧（米国・欧州・アジア）",
+    "sentiment_gauge": "センチメント分析ゲージ（円グラフ）"
+  },
+  "production_notes": {
+    "audio": {
+      "bgm": "calm_corporate_loop",
+      "volume_ratio": "voice:80, bgm:20"
+    },
+    "transitions": {
+      "segment_change": "fade_with_slide",
+      "duration_ms": 500
+    },
+    "lower_thirds": {
+      "show_ticker": true,
+      "show_segment_title": true,
+      "position": "bottom_left"
+    }
+  }
+}

@@ -1,0 +1,117 @@
+name: AI Trading Challenge
+
+on:
+  schedule:
+    - cron: '0 7 * * 1-5'  # Daily 16:00 JST (after market close)
+    - cron: '0 8 * * 5'    # Weekly summary 17:00 JST Friday
+  workflow_dispatch:
+    inputs:
+      job:
+        description: 'Job to run'
+        required: true
+        type: choice
+        options:
+          - daily
+          - weekly
+      date:
+        description: 'Target date (YYYY-MM-DD), defaults to today'
+        required: false
+        type: string
+      dry_run:
+        description: 'Dry run (no trades)'
+        required: false
+        type: boolean
+        default: false
+
+env:
+  PYTHONPATH: ${{ github.workspace }}
+
+jobs:
+  daily:
+    if: github.event.schedule == '0 7 * * 1-5' || github.event.inputs.job == 'daily'
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: pip
+
+      - name: Install dependencies
+        run: |
+          pip install -r requirements.txt
+          pip install playwright anthropic
+          playwright install chromium --with-deps
+
+      - name: Restore note.com session
+        if: env.NOTE_SESSION_JSON != ''
+        env:
+          NOTE_SESSION_JSON: ${{ secrets.NOTE_SESSION_JSON }}
+        run: |
+          mkdir -p ~/.smartir
+          echo "$NOTE_SESSION_JSON" > ~/.smartir/note_session.json
+          chmod 600 ~/.smartir/note_session.json
+
+      - name: Run trading challenge
+        env:
+          DATABASE_URL: ${{ secrets.SUPABASE_DB_URL }}
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          NOTE_EMAIL: ${{ secrets.NOTE_EMAIL }}
+          NOTE_PASSWORD: ${{ secrets.NOTE_PASSWORD }}
+          TWITTER_API_KEY: ${{ secrets.TWITTER_API_KEY }}
+          TWITTER_API_SECRET: ${{ secrets.TWITTER_API_SECRET }}
+          TWITTER_ACCESS_TOKEN: ${{ secrets.TWITTER_ACCESS_TOKEN }}
+          TWITTER_ACCESS_SECRET: ${{ secrets.TWITTER_ACCESS_SECRET }}
+        run: |
+          DATE_ARG=""
+          DRY_RUN_ARG=""
+          if [ -n "${{ github.event.inputs.date }}" ]; then
+            DATE_ARG="--date ${{ github.event.inputs.date }}"
+          fi
+          if [ "${{ github.event.inputs.dry_run }}" = "true" ]; then
+            DRY_RUN_ARG="--dry-run"
+          fi
+          python scripts/run_trading_challenge.py $DATE_ARG $DRY_RUN_ARG
+
+  weekly:
+    if: github.event.schedule == '0 8 * * 5' || github.event.inputs.job == 'weekly'
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: pip
+
+      - name: Install dependencies
+        run: |
+          pip install -r requirements.txt
+          pip install playwright anthropic
+          playwright install chromium --with-deps
+
+      - name: Restore note.com session
+        if: env.NOTE_SESSION_JSON != ''
+        env:
+          NOTE_SESSION_JSON: ${{ secrets.NOTE_SESSION_JSON }}
+        run: |
+          mkdir -p ~/.smartir
+          echo "$NOTE_SESSION_JSON" > ~/.smartir/note_session.json
+          chmod 600 ~/.smartir/note_session.json
+
+      - name: Run weekly summary
+        env:
+          DATABASE_URL: ${{ secrets.SUPABASE_DB_URL }}
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          NOTE_EMAIL: ${{ secrets.NOTE_EMAIL }}
+          NOTE_PASSWORD: ${{ secrets.NOTE_PASSWORD }}
+          TWITTER_API_KEY: ${{ secrets.TWITTER_API_KEY }}
+          TWITTER_API_SECRET: ${{ secrets.TWITTER_API_SECRET }}
+          TWITTER_ACCESS_TOKEN: ${{ secrets.TWITTER_ACCESS_TOKEN }}
+          TWITTER_ACCESS_SECRET: ${{ secrets.TWITTER_ACCESS_SECRET }}
+        run: |
+          python scripts/run_trading_challenge.py --no-publish
+          echo "Weekly summary publishing TBD"

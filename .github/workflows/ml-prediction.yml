@@ -1,0 +1,23 @@
+name: ML Prediction Update
+
+on:
+  schedule:
+    # 9:00 JST = 0:00 UTC
+    - cron: "0 0 * * 1-5"
+  workflow_dispatch:
+
+jobs:
+  predict:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: pip
+      - run: pip install -r requirements.txt
+      - run: python scripts/run_ml_prediction.py
+        env:
+          DATABASE_URL: ${{ secrets.SUPABASE_DB_URL }}
+          JQUANTS_MAIL_ADDRESS: ${{ secrets.JQUANTS_MAIL_ADDRESS }}
+          JQUANTS_PASSWORD: ${{ secrets.JQUANTS_PASSWORD }}

@@ -1,0 +1,227 @@
+name: SmartIR Publish (note.com + X)
+
+on:
+  schedule:
+    - cron: '0 0 * * 1-5'   # Morning (09:00 JST weekdays)
+    - cron: '0 11 * * *'    # Evening (20:00 JST daily)
+    - cron: '0 1 * * 0'     # Weekly (10:00 JST Sunday)
+    - cron: '0 2 * * 1-5'   # Engagement (11:00 JST weekdays)
+    - cron: '0 5 * * 1,3,5' # Follow (14:00 JST Mon/Wed/Fri)
+  workflow_dispatch:
+    inputs:
+      job:
+        description: 'Job to run'
+        required: true
+        type: choice
+        options:
+          - morning
+          - evening
+          - weekly
+          - engage
+          - follow
+      date:
+        description: 'Target date (YYYY-MM-DD), defaults to today'
+        required: false
+        type: string
+
+env:
+  PYTHONPATH: ${{ github.workspace }}
+
+jobs:
+  morning:
+    if: github.event.schedule == '0 0 * * 1-5' || github.event.inputs.job == 'morning'
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: pip
+
+      - name: Install dependencies
+        run: |
+          pip install -r requirements.txt
+          pip install playwright anthropic
+          playwright install chromium --with-deps
+
+      - name: Restore note.com session
+        if: env.NOTE_SESSION_JSON != ''
+        env:
+          NOTE_SESSION_JSON: ${{ secrets.NOTE_SESSION_JSON }}
+        run: |
+          mkdir -p ~/.smartir
+          echo "$NOTE_SESSION_JSON" > ~/.smartir/note_session.json
+          chmod 600 ~/.smartir/note_session.json
+
+      - name: Publish breaking articles (auto-detect new docs)
+        env:
+          DATABASE_URL: ${{ secrets.SUPABASE_DB_URL }}
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          NOTE_EMAIL: ${{ secrets.NOTE_EMAIL }}
+          NOTE_PASSWORD: ${{ secrets.NOTE_PASSWORD }}
+        run: python scripts/run_morning_publish.py
+        timeout-minutes: 20
+
+      - name: Tweet breaking news
+        env:
+          DATABASE_URL: ${{ secrets.SUPABASE_DB_URL }}
+          TWITTER_API_KEY: ${{ secrets.TWITTER_API_KEY }}
+          TWITTER_API_SECRET: ${{ secrets.TWITTER_API_SECRET }}
+          TWITTER_ACCESS_TOKEN: ${{ secrets.TWITTER_ACCESS_TOKEN }}
+          TWITTER_ACCESS_SECRET: ${{ secrets.TWITTER_ACCESS_SECRET }}
+        run: python scripts/run_morning_tweet.py
+        continue-on-error: true
+
+  evening:
+    if: github.event.schedule == '0 11 * * *' || github.event.inputs.job == 'evening'
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: pip
+
+      - name: Install dependencies
+        run: |
+          pip install -r requirements.txt
+          pip install playwright anthropic
+          playwright install chromium --with-deps
+
+      - name: Restore note.com session
+        if: env.NOTE_SESSION_JSON != ''
+        env:
+          NOTE_SESSION_JSON: ${{ secrets.NOTE_SESSION_JSON }}
+        run: |
+          mkdir -p ~/.smartir
+          echo "$NOTE_SESSION_JSON" > ~/.smartir/note_session.json
+          chmod 600 ~/.smartir/note_session.json
+
+      - name: Publish daily summary to note.com
+        env:
+          DATABASE_URL: ${{ secrets.SUPABASE_DB_URL }}
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          NOTE_EMAIL: ${{ secrets.NOTE_EMAIL }}
+          NOTE_PASSWORD: ${{ secrets.NOTE_PASSWORD }}
+        run: |
+          if [ -n "${{ github.event.inputs.date }}" ]; then
+            python -m app.cli publish daily --date "${{ github.event.inputs.date }}"
+          else
+            python -m app.cli publish daily
+          fi
+
+      - name: Tweet daily summary
+        env:
+          DATABASE_URL: ${{ secrets.SUPABASE_DB_URL }}
+          TWITTER_API_KEY: ${{ secrets.TWITTER_API_KEY }}
+          TWITTER_API_SECRET: ${{ secrets.TWITTER_API_SECRET }}
+          TWITTER_ACCESS_TOKEN: ${{ secrets.TWITTER_ACCESS_TOKEN }}
+          TWITTER_ACCESS_SECRET: ${{ secrets.TWITTER_ACCESS_SECRET }}
+        run: |
+          if [ -n "${{ github.event.inputs.date }}" ]; then
+            python -m app.cli tweet daily --date "${{ github.event.inputs.date }}"
+          else
+            python -m app.cli tweet daily
+          fi
+        continue-on-error: true
+
+  weekly:
+    if: github.event.schedule == '0 1 * * 0' || github.event.inputs.job == 'weekly'
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: pip
+
+      - name: Install dependencies
+        run: |
+          pip install -r requirements.txt
+          pip install playwright anthropic
+          playwright install chromium --with-deps
+
+      - name: Restore note.com session
+        if: env.NOTE_SESSION_JSON != ''
+        env:
+          NOTE_SESSION_JSON: ${{ secrets.NOTE_SESSION_JSON }}
+        run: |
+          mkdir -p ~/.smartir
+          echo "$NOTE_SESSION_JSON" > ~/.smartir/note_session.json
+          chmod 600 ~/.smartir/note_session.json
+
+      - name: Publish weekly trend report to note.com
+        env:
+          DATABASE_URL: ${{ secrets.SUPABASE_DB_URL }}
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          NOTE_EMAIL: ${{ secrets.NOTE_EMAIL }}
+          NOTE_PASSWORD: ${{ secrets.NOTE_PASSWORD }}
+        run: python -m app.cli publish weekly
+
+      - name: Tweet weekly summary
+        env:
+          DATABASE_URL: ${{ secrets.SUPABASE_DB_URL }}
+          TWITTER_API_KEY: ${{ secrets.TWITTER_API_KEY }}
+          TWITTER_API_SECRET: ${{ secrets.TWITTER_API_SECRET }}
+          TWITTER_ACCESS_TOKEN: ${{ secrets.TWITTER_ACCESS_TOKEN }}
+          TWITTER_ACCESS_SECRET: ${{ secrets.TWITTER_ACCESS_SECRET }}
+        run: python -m app.cli tweet weekly
+        continue-on-error: true
+
+  engage:
+    if: github.event.schedule == '0 2 * * 1-5' || github.event.inputs.job == 'engage'
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: pip
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Execute X engagement
+        env:
+          DATABASE_URL: ${{ secrets.SUPABASE_DB_URL }}
+          TWITTER_API_KEY: ${{ secrets.TWITTER_API_KEY }}
+          TWITTER_API_SECRET: ${{ secrets.TWITTER_API_SECRET }}
+          TWITTER_ACCESS_TOKEN: ${{ secrets.TWITTER_ACCESS_TOKEN }}
+          TWITTER_ACCESS_SECRET: ${{ secrets.TWITTER_ACCESS_SECRET }}
+        run: python -m app.cli engage run
+        continue-on-error: true
+
+  follow:
+    if: github.event.schedule == '0 5 * * 1,3,5' || github.event.inputs.job == 'follow'
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: pip
+
+      - name: Install dependencies
+        run: |
+          pip install -r requirements.txt
+          pip install playwright
+          playwright install chromium --with-deps
+
+      - name: Execute note.com auto-follow
+        env:
+          DATABASE_URL: ${{ secrets.SUPABASE_DB_URL }}
+          NOTE_EMAIL: ${{ secrets.NOTE_EMAIL }}
+          NOTE_PASSWORD: ${{ secrets.NOTE_PASSWORD }}
+        run: python -m app.cli follow run
+        continue-on-error: true
