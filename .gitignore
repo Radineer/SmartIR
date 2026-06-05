@@ -111,3 +111,8 @@ coverage/
 *.db.gz
 *.db.bak*
 *.bak_*
+output/
+*.mp4
+*.wav
+frontend/public/video-frames/
+*.tar.gz
